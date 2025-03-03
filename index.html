@@ -24,10 +24,8 @@
   </style>
 </head>
 <body class="bg-white text-gray-800 min-h-screen">
-
   <!-- Contenedor principal -->
-  <div class="max-w-5xl mx-auto px-4 py-8">
-
+  <div class="container mx-auto px-4 py-8">
     <!-- Navegación principal en el orden requerido -->
     <nav class="flex flex-wrap items-center justify-center gap-6 mb-10 text-sm font-semibold">
       <button id="navMerge" class="text-gray-600 hover:text-black focus:outline-none">
@@ -62,12 +60,12 @@
         </select>
         <input type="text" id="customFileNameMerge" placeholder="Nombre personalizado" class="w-full border border-gray-300 rounded px-3 py-2 mt-2 hidden focus:outline-none focus:ring focus:ring-blue-300" />
       </div>
-      <!-- Campo para seleccionar múltiples archivos -->
+      <!-- Selección múltiple de archivos -->
       <div class="mb-6">
         <label class="block mb-2 font-semibold">Selecciona archivos CSV:</label>
         <input type="file" id="mergeFilesInput" multiple accept=".csv" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300" />
       </div>
-      <!-- Lista de archivos seleccionados con opción de quitar -->
+      <!-- Lista de archivos con opción de eliminar -->
       <div class="mb-6">
         <h4 class="font-semibold mb-2">Archivos a unificar:</h4>
         <ul id="mergeFileList" class="list-disc pl-5 text-sm text-gray-600"></ul>
@@ -98,8 +96,8 @@
       <div class="mb-6">
         <input type="text" id="baseFileName" placeholder="Nombre base para los archivos" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300" />
       </div>
-      <!-- Slider para definir cantidad de líneas por archivo en Dividir -->
-      <div class="flex items-center mb-6">
+      <!-- Slider para definir cantidad de líneas por archivo (Dividir) -->
+      <div class="flex flex-col md:flex-row items-center mb-6">
         <label for="splitRestrictSlider" class="font-medium mr-4">Líneas por archivo:</label>
         <input type="range" id="splitRestrictSlider" min="0" max="10000" value="899" class="mr-2">
         <input type="number" id="splitRestrictInput" min="0" class="w-20 border border-gray-300 rounded px-2 py-1" value="899">
@@ -148,7 +146,7 @@
         <input type="text" id="exportFields" placeholder="Ejemplo: currency, amount" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300" />
       </div>
       <!-- Slider para definir cantidad de líneas por archivo en Agrupar por -->
-      <div class="flex items-center mb-6">
+      <div class="flex flex-col md:flex-row items-center mb-6">
         <label for="groupByRestrictSlider" class="font-medium mr-4">Líneas por archivo:</label>
         <input type="range" id="groupByRestrictSlider" min="0" max="10000" value="899" class="mr-2">
         <input type="number" id="groupByRestrictInput" min="0" class="w-20 border border-gray-300 rounded px-2 py-1" value="899">
@@ -178,7 +176,7 @@
         Carga un archivo CSV, agrupa los registros por <code class="bg-gray-100 px-1 py-0.5 rounded">currency_iso</code> y genera archivos con el nombre y carpeta elegidos (Mensajería interna o Email). El sistema dividirá los archivos según el intervalo de líneas especificado.
       </p>
       <!-- Slider para definir cantidad de líneas por archivo en Mensajería interna e Email -->
-      <div class="flex items-center mb-6">
+      <div class="flex flex-col md:flex-row items-center mb-6">
         <label for="emailRestrictSlider" class="font-medium mr-4">Líneas por archivo:</label>
         <input type="range" id="emailRestrictSlider" min="0" max="10000" value="899" class="mr-2">
         <input type="number" id="emailRestrictInput" min="0" class="w-20 border border-gray-300 rounded px-2 py-1" value="899">
@@ -194,6 +192,27 @@
         </select>
         <input type="text" id="customFileNameGroup" placeholder="Nombre personalizado para el archivo" class="w-full border border-gray-300 rounded px-3 py-2 mt-2 hidden focus:outline-none focus:ring focus:ring-blue-300" />
       </div>
+      <!-- Comportamiento para ajustar el slider según la opción seleccionada -->
+      <script>
+        document.getElementById("fileNamingGroup").addEventListener("change", (e) => {
+          const value = e.target.value;
+          const customFileNameGroup = document.getElementById("customFileNameGroup");
+          if (value === "custom") {
+            customFileNameGroup.classList.remove("hidden");
+          } else {
+            customFileNameGroup.classList.add("hidden");
+          }
+          const slider = document.getElementById("emailRestrictSlider");
+          const input = document.getElementById("emailRestrictInput");
+          if (value === "mensajeria_interna") {
+            slider.value = 899;
+            input.value = 899;
+          } else if (value === "email") {
+            slider.value = 0;
+            input.value = 0;
+          }
+        });
+      </script>
       <!-- Opciones para nombrar la carpeta de exportación -->
       <div class="mb-6">
         <label for="folderNamingGroup" class="block mb-2 font-semibold">Nombre de carpeta:</label>
@@ -233,7 +252,7 @@
         <label class="block mb-2 font-semibold">Archivos CSV de datos (sin encabezado):</label>
         <input type="file" id="acreditarDataFiles" multiple accept=".csv" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300" />
       </div>
-      <!-- Listado de archivos de datos a acreditar con opción de quitar -->
+      <!-- Listado de archivos con opción de eliminar -->
       <div class="mb-6">
         <h4 class="font-semibold mb-2">Archivos a acreditar:</h4>
         <ul id="acreditarFileList" class="list-disc pl-5 text-sm text-gray-600"></ul>
@@ -273,10 +292,9 @@
         </button>
       </div>
     </section>
-
   </div><!-- Fin contenedor principal -->
 
-  <!-- Slider de modo diurno/nocturno -->
+  <!-- Slider para modo diurno/nocturno -->
   <div class="fixed top-4 right-4 z-50">
     <label class="flex items-center cursor-pointer">
       <div class="relative">
@@ -288,7 +306,7 @@
     </label>
   </div>
 
-  <!-- Footer: textos en esquina inferior derecha -->
+  <!-- Footer -->
   <div class="fixed bottom-4 right-4 text-gray-500 opacity-80 text-sm text-right">
     <div>Gerencia de Producto</div>
     <div>Departamento de Retención</div>
@@ -351,6 +369,16 @@
       } else {
         customFileNameGroup.classList.add("hidden");
       }
+      // Cada vez que se selecciona una opción, se ajusta el slider:
+      const slider = document.getElementById("emailRestrictSlider");
+      const input = document.getElementById("emailRestrictInput");
+      if (value === "mensajeria_interna") {
+        slider.value = 899;
+        input.value = 899;
+      } else if (value === "email") {
+        slider.value = 0;
+        input.value = 0;
+      }
     });
 
     document.getElementById("folderNamingGroup").addEventListener("change", (e) => {
@@ -407,7 +435,6 @@
       const customName = document.getElementById("customFileNameGroup").value;
       let chunkSize = parseInt(document.getElementById("emailRestrictInput").value, 10);
       if (chunkSize === 0) {
-        // Sin restricción: todo el grupo en un solo archivo
         chunkSize = Infinity;
       }
 
@@ -521,20 +548,16 @@
     document.getElementById("splitBtn").addEventListener("click", async () => {
       const file = document.getElementById("splitFile").files[0];
       if (!file) return alert("Selecciona un archivo para dividir.");
-
       const text = (await file.text()).trim();
       const rows = text.split("\n").filter(row => row.trim() !== "");
       const baseName = document.getElementById("baseFileName").value || "ARCHIVO_DIVIDIDO";
       let chunkSize = parseInt(document.getElementById("splitRestrictInput").value, 10);
       if (chunkSize === 0) {
-        // Sin restricción: un solo archivo
         chunkSize = rows.length;
       }
-
       const zip = new JSZip();
       const folderName = `DIVIDIDO_${formatDate()}`;
       const folder = zip.folder(folderName);
-
       const header = rows.shift();
       let chunkNumber = 1;
       while (rows.length > 0) {
@@ -544,7 +567,6 @@
         folder.file(fileName, content);
         chunkNumber++;
       }
-
       const blob = await zip.generateAsync({ type: "blob" });
       const link = document.createElement("a");
       link.href = URL.createObjectURL(blob);
@@ -608,7 +630,6 @@
       const dateStr = formatDate();
       const baseName = document.getElementById("groupByFileName").value.trim();
       let groupRestrict = parseInt(document.getElementById("groupByRestrictInput").value, 10);
-      // Si el usuario selecciona 0, no se establece restricción (todo en un solo archivo)
       for (const groupValue in grouping) {
            const groupRows = grouping[groupValue];
            if (groupRestrict === 0) groupRestrict = groupRows.length;
@@ -784,12 +805,10 @@
       const rawData = parseGameCurrencyDayCSV(juegoCurrencyContent);
       const selectedDay = parseInt(document.getElementById("selectWeekDay").value, 10);
       const dayFiltered = rawData.filter(d => parseInt(d.day) === selectedDay);
-
       if (dayFiltered.length === 0) {
         alert("No se encontraron juegos para el día seleccionado.");
         return;
       }
-
       gameCurrencyMap = {};
       dayFiltered.forEach(item => {
         if (!gameCurrencyMap[item.game]) {
@@ -797,13 +816,11 @@
         }
         gameCurrencyMap[item.game].add(item.currency);
       });
-
       const currencyIndex = detectCurrencyColumn(acreditarDataRows, gameCurrencyMap);
       if (currencyIndex === -1) {
         alert("No se pudo detectar la columna de moneda en los datos.");
         return;
       }
-
       const groupedByCurrency = groupDataByCurrency(acreditarDataRows, currencyIndex);
       const filesByGame = createFilesForGames(gameCurrencyMap, groupedByCurrency);
       mostrarResultadosAcreditar(filesByGame);

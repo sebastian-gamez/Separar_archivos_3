@@ -8,205 +8,79 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- JSZip -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <style>
+    /* Estilos para el modo nocturno */
+    body.dark {
+      background-color: #1a202c;
+      color: #f7fafc;
+    }
+    /* Ajustes para el slider de tema */
+    .dot {
+      transition: transform 0.3s ease;
+    }
+    #themeToggle:checked + div + .dot {
+      transform: translateX(100%);
+    }
+  </style>
 </head>
 <body class="bg-white text-gray-800 min-h-screen">
 
   <!-- Contenedor principal -->
   <div class="max-w-5xl mx-auto px-4 py-8">
 
-    <!-- Navegación principal -->
-    <nav class="flex items-center justify-center gap-6 mb-10 text-sm font-semibold">
-      <button id="navGroup" class="text-gray-600 hover:text-black focus:outline-none">
-        Mensajería interna e Email
-      </button>
+    <!-- Navegación principal en el orden requerido -->
+    <nav class="flex flex-wrap items-center justify-center gap-6 mb-10 text-sm font-semibold">
       <button id="navMerge" class="text-gray-600 hover:text-black focus:outline-none">
         Unificar
       </button>
       <button id="navSplit" class="text-gray-600 hover:text-black focus:outline-none">
         Dividir
       </button>
+      <button id="navGroupBy" class="text-gray-600 hover:text-black focus:outline-none">
+        Agrupar por
+      </button>
+      <button id="navGroup" class="text-gray-600 hover:text-black focus:outline-none">
+        Mensajería interna e Email
+      </button>
       <button id="navAcreditar" class="text-gray-600 hover:text-black focus:outline-none">
         Acreditar FS por juego y moneda
       </button>
     </nav>
 
-    <!-- SECCIÓN: Mensajería interna e Email -->
-    <section id="groupSection" class="hidden">
-      <h1 class="text-3xl font-bold mb-6">Mensajería interna e Email</h1>
-      <p class="mb-6 leading-relaxed">
-        Carga un archivo CSV, agrupa los registros por <code class="bg-gray-100 px-1 py-0.5 rounded">currency_iso</code> y 
-        genera archivos con el nombre y carpeta elegidos (Mensajería interna o Email). 
-        Puedes optar por limitar cada archivo a 899 líneas o no. 
-        El nombre de cada archivo incluirá el <strong>currency_iso</strong> y la fecha de exportación.
-      </p>
-
-      <!-- Toggle para restricción de 899 líneas -->
-      <div class="flex items-center mb-6">
-        <label class="font-medium mr-4">Restricción de 899 líneas:</label>
-        <label class="relative inline-flex items-center cursor-pointer select-none">
-          <input
-            type="checkbox"
-            id="restrictToggle"
-            class="sr-only peer"
-            checked
-          />
-          <div
-            class="w-12 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-400 rounded-full
-                   peer-checked:bg-blue-600 peer peer-checked:after:translate-x-full peer-checked:after:border-white
-                   after:content-[''] after:absolute after:top-[2px] after:left-[2px]
-                   after:bg-white after:border-gray-300 after:border after:rounded-full
-                   after:h-5 after:w-5 after:transition-all"
-          ></div>
-          <span id="restrictLabel" class="ml-3 text-sm text-gray-700 font-medium">
-            Con restricción
-          </span>
-        </label>
-      </div>
-
-      <!-- Opciones de nombres para los archivos -->
-      <div class="mb-6">
-        <label for="fileNamingGroup" class="block mb-2 font-semibold">
-          Opciones de nombres (archivos):
-        </label>
-        <select
-          id="fileNamingGroup"
-          class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300"
-        >
-          <option value="mensajeria_interna">Mensajería interna</option>
-          <option value="email">Email</option>
-          <option value="custom">Personalizado</option>
-        </select>
-        <input
-          type="text"
-          id="customFileNameGroup"
-          placeholder="Nombre personalizado para el archivo"
-          class="w-full border border-gray-300 rounded px-3 py-2 mt-2 hidden focus:outline-none focus:ring focus:ring-blue-300"
-        />
-      </div>
-
-      <!-- Opciones para nombrar la carpeta de exportación -->
-      <div class="mb-6">
-        <label for="folderNamingGroup" class="block mb-2 font-semibold">
-          Nombre de carpeta:
-        </label>
-        <select
-          id="folderNamingGroup"
-          class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300"
-        >
-          <option value="mensajeria_interna">Mensajería Interna</option>
-          <option value="email">Email</option>
-          <option value="custom">Personalizado</option>
-        </select>
-        <input
-          type="text"
-          id="customFolderNameGroup"
-          placeholder="Nombre personalizado para la carpeta"
-          class="w-full border border-gray-300 rounded px-3 py-2 mt-2 hidden focus:outline-none focus:ring focus:ring-blue-300"
-        />
-      </div>
-
-      <div class="mb-6">
-        <input
-          type="file"
-          id="csvFile"
-          accept=".csv"
-          class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300"
-        />
-      </div>
-
-      <button
-        id="processBtn"
-        class="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition-colors"
-      >
-        Procesar
-      </button>
-
-      <button
-        id="resetGroupBtn"
-        class="w-full bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600 mt-2 transition-colors"
-      >
-        Reiniciar
-      </button>
-
-      <div id="groupDownloadSection" class="hidden mt-8">
-        <h3 class="text-xl font-bold mb-2">Archivos Generados</h3>
-        <ul id="groupDownloadList" class="list-disc pl-5 mb-4"></ul>
-        <button
-          id="groupDownloadAllBtn"
-          class="w-full bg-purple-500 text-white py-2 px-4 rounded hover:bg-purple-600 transition-colors"
-        >
-          Descargar Todo
-        </button>
-      </div>
-    </section>
-
     <!-- SECCIÓN: Unificar -->
     <section id="mergeSection" class="hidden">
       <h1 class="text-3xl font-bold mb-6">Unificar Archivos</h1>
       <p class="mb-6 leading-relaxed">
-        Carga todos los archivos CSV que desees unificar. Puedes seleccionarlos
-        todos de una sola vez o ir agregándolos uno a uno. Al final, el sistema
-        los unirá en un solo archivo.
+        Carga todos los archivos CSV que desees unificar. Puedes seleccionarlos todos de una sola vez o ir agregándolos uno a uno. Al final, el sistema los unirá en un solo archivo.
       </p>
-
       <!-- Nombre del archivo unificado -->
       <div class="mb-6">
-        <label for="fileNamingMerge" class="block mb-2 font-semibold">
-          Nombre del archivo unificado:
-        </label>
-        <select
-          id="fileNamingMerge"
-          class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300"
-        >
+        <label for="fileNamingMerge" class="block mb-2 font-semibold">Nombre del archivo unificado:</label>
+        <select id="fileNamingMerge" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300">
           <option value="unificado">Unificado</option>
           <option value="custom">Personalizado</option>
         </select>
-        <input
-          type="text"
-          id="customFileNameMerge"
-          placeholder="Nombre personalizado"
-          class="w-full border border-gray-300 rounded px-3 py-2 mt-2 hidden focus:outline-none focus:ring focus:ring-blue-300"
-        />
+        <input type="text" id="customFileNameMerge" placeholder="Nombre personalizado" class="w-full border border-gray-300 rounded px-3 py-2 mt-2 hidden focus:outline-none focus:ring focus:ring-blue-300" />
       </div>
-
       <!-- Campo para seleccionar múltiples archivos -->
       <div class="mb-6">
         <label class="block mb-2 font-semibold">Selecciona archivos CSV:</label>
-        <input
-          type="file"
-          id="mergeFilesInput"
-          multiple
-          accept=".csv"
-          class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300"
-        />
+        <input type="file" id="mergeFilesInput" multiple accept=".csv" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300" />
       </div>
-
       <!-- Lista de archivos seleccionados con opción de quitar -->
       <div class="mb-6">
         <h4 class="font-semibold mb-2">Archivos a unificar:</h4>
         <ul id="mergeFileList" class="list-disc pl-5 text-sm text-gray-600"></ul>
       </div>
-
-      <button
-        id="mergeBtn"
-        class="w-full bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 transition-colors"
-      >
+      <button id="mergeBtn" class="w-full bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 transition-colors">
         Unificar
       </button>
-
-      <button
-        id="resetMergeBtn"
-        class="w-full bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600 mt-2 transition-colors"
-      >
+      <button id="resetMergeBtn" class="w-full bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600 mt-2 transition-colors">
         Reiniciar
       </button>
-
       <div id="mergeDownloadSection" class="hidden mt-8">
         <h3 class="text-xl font-bold mb-2">Archivo Unificado</h3>
-        <button
-          id="mergeDownloadBtn"
-          class="w-full bg-yellow-500 text-white py-2 px-4 rounded hover:bg-yellow-600 transition-colors"
-        >
+        <button id="mergeDownloadBtn" class="w-full bg-yellow-500 text-white py-2 px-4 rounded hover:bg-yellow-600 transition-colors">
           Descargar
         </button>
       </div>
@@ -216,48 +90,133 @@
     <section id="splitSection" class="hidden">
       <h1 class="text-3xl font-bold mb-6">Dividir Archivo</h1>
       <p class="mb-6 leading-relaxed">
-        Divide un archivo CSV en partes de <strong>899</strong> filas cada una.
-        Se conservará la primera fila como encabezado en cada parte.
+        Divide un archivo CSV en partes. Se conservará la primera fila como encabezado en cada parte.
       </p>
-
       <div class="mb-6">
-        <input
-          type="file"
-          id="splitFile"
-          accept=".csv"
-          class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300"
-        />
+        <input type="file" id="splitFile" accept=".csv" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300" />
       </div>
       <div class="mb-6">
-        <input
-          type="text"
-          id="baseFileName"
-          placeholder="Nombre base para los archivos"
-          class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300"
-        />
+        <input type="text" id="baseFileName" placeholder="Nombre base para los archivos" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300" />
       </div>
-
-      <button
-        id="splitBtn"
-        class="w-full bg-yellow-500 text-white py-2 px-4 rounded hover:bg-yellow-600 transition-colors"
-      >
+      <!-- Slider para definir cantidad de líneas por archivo en Dividir -->
+      <div class="flex items-center mb-6">
+        <label for="splitRestrictSlider" class="font-medium mr-4">Líneas por archivo:</label>
+        <input type="range" id="splitRestrictSlider" min="0" max="10000" value="899" class="mr-2">
+        <input type="number" id="splitRestrictInput" min="0" class="w-20 border border-gray-300 rounded px-2 py-1" value="899">
+        <span class="ml-2 text-sm text-gray-500">(0 = sin restricción)</span>
+      </div>
+      <button id="splitBtn" class="w-full bg-yellow-500 text-white py-2 px-4 rounded hover:bg-yellow-600 transition-colors">
         Dividir
       </button>
-
-      <button
-        id="resetSplitBtn"
-        class="w-full bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600 mt-2 transition-colors"
-      >
+      <button id="resetSplitBtn" class="w-full bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600 mt-2 transition-colors">
         Reiniciar
       </button>
-
       <div id="splitDownloadSection" class="hidden mt-8">
         <h3 class="text-xl font-bold mb-2">Archivos Divididos</h3>
         <ul id="splitDownloadList" class="list-disc pl-5 mb-4"></ul>
-        <button
-          id="splitDownloadAllBtn"
-          class="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition-colors"
-        >
+        <button id="splitDownloadAllBtn" class="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition-colors">
+          Descargar Todo
+        </button>
+      </div>
+    </section>
+
+    <!-- SECCIÓN: Agrupar por -->
+    <section id="groupbySection" class="hidden">
+      <h1 class="text-3xl font-bold mb-6">Agrupar por</h1>
+      <p class="mb-6 leading-relaxed">
+        Carga un archivo CSV, ingresa el campo por el cual deseas agrupar, define los campos a exportar (opcional) y personaliza los nombres de exportación. Se generarán archivos CSV para cada grupo (divididos si exceden el número de líneas establecido) que podrás descargar individualmente o como un ZIP.
+      </p>
+      <div class="mb-6">
+        <label for="groupByCSV" class="block mb-2 font-semibold">Archivo CSV a agrupar:</label>
+        <input type="file" id="groupByCSV" accept=".csv" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300" />
+      </div>
+      <div class="mb-6">
+        <label for="groupByField" class="block mb-2 font-semibold">Campo para agrupar:</label>
+        <input type="text" id="groupByField" placeholder="Ejemplo: categoría" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300" />
+      </div>
+      <div class="mb-6">
+        <label for="groupByFileName" class="block mb-2 font-semibold">Nombre base para archivos individuales:</label>
+        <input type="text" id="groupByFileName" placeholder="Nombre base (opcional)" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300" />
+      </div>
+      <div class="mb-6">
+        <label for="groupByFolderName" class="block mb-2 font-semibold">Nombre de carpeta para descarga agrupada:</label>
+        <input type="text" id="groupByFolderName" placeholder="Nombre de carpeta (opcional)" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300" />
+      </div>
+      <!-- Campos a exportar -->
+      <div class="mb-6">
+        <label for="exportFields" class="block mb-2 font-semibold">Campos a exportar (separados por coma):</label>
+        <input type="text" id="exportFields" placeholder="Ejemplo: currency, amount" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300" />
+      </div>
+      <!-- Slider para definir cantidad de líneas por archivo en Agrupar por -->
+      <div class="flex items-center mb-6">
+        <label for="groupByRestrictSlider" class="font-medium mr-4">Líneas por archivo:</label>
+        <input type="range" id="groupByRestrictSlider" min="0" max="10000" value="899" class="mr-2">
+        <input type="number" id="groupByRestrictInput" min="0" class="w-20 border border-gray-300 rounded px-2 py-1" value="899">
+        <span class="ml-2 text-sm text-gray-500">(0 = sin restricción)</span>
+      </div>
+      <div class="mb-6 flex gap-4">
+        <button id="groupByIndividualBtn" class="flex-1 bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 transition-colors">
+          Agrupar y Descargar Individualmente
+        </button>
+        <button id="groupByZipBtn" class="flex-1 bg-purple-500 text-white py-2 px-4 rounded hover:bg-purple-600 transition-colors">
+          Agrupar y Descargar Todo en ZIP
+        </button>
+      </div>
+      <button id="resetGroupByBtn" class="w-full bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600 mt-2 transition-colors">
+        Reiniciar
+      </button>
+      <div id="groupByDownloadSection" class="hidden mt-8">
+        <h3 class="text-xl font-bold mb-2">Archivos Agrupados</h3>
+        <ul id="groupByDownloadList" class="list-disc pl-5 mb-4"></ul>
+      </div>
+    </section>
+
+    <!-- SECCIÓN: Mensajería interna e Email -->
+    <section id="groupSection" class="hidden">
+      <h1 class="text-3xl font-bold mb-6">Mensajería interna e Email</h1>
+      <p class="mb-6 leading-relaxed">
+        Carga un archivo CSV, agrupa los registros por <code class="bg-gray-100 px-1 py-0.5 rounded">currency_iso</code> y genera archivos con el nombre y carpeta elegidos (Mensajería interna o Email). El sistema dividirá los archivos según el intervalo de líneas especificado.
+      </p>
+      <!-- Slider para definir cantidad de líneas por archivo en Mensajería interna e Email -->
+      <div class="flex items-center mb-6">
+        <label for="emailRestrictSlider" class="font-medium mr-4">Líneas por archivo:</label>
+        <input type="range" id="emailRestrictSlider" min="0" max="10000" value="899" class="mr-2">
+        <input type="number" id="emailRestrictInput" min="0" class="w-20 border border-gray-300 rounded px-2 py-1" value="899">
+        <span class="ml-2 text-sm text-gray-500">(0 = sin restricción)</span>
+      </div>
+      <!-- Opciones de nombres para los archivos -->
+      <div class="mb-6">
+        <label for="fileNamingGroup" class="block mb-2 font-semibold">Opciones de nombres (archivos):</label>
+        <select id="fileNamingGroup" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300">
+          <option value="mensajeria_interna">Mensajería interna</option>
+          <option value="email">Email</option>
+          <option value="custom">Personalizado</option>
+        </select>
+        <input type="text" id="customFileNameGroup" placeholder="Nombre personalizado para el archivo" class="w-full border border-gray-300 rounded px-3 py-2 mt-2 hidden focus:outline-none focus:ring focus:ring-blue-300" />
+      </div>
+      <!-- Opciones para nombrar la carpeta de exportación -->
+      <div class="mb-6">
+        <label for="folderNamingGroup" class="block mb-2 font-semibold">Nombre de carpeta:</label>
+        <select id="folderNamingGroup" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300">
+          <option value="mensajeria_interna">Mensajería Interna</option>
+          <option value="email">Email</option>
+          <option value="custom">Personalizado</option>
+        </select>
+        <input type="text" id="customFolderNameGroup" placeholder="Nombre personalizado para la carpeta" class="w-full border border-gray-300 rounded px-3 py-2 mt-2 hidden focus:outline-none focus:ring focus:ring-blue-300" />
+      </div>
+      <div class="mb-6">
+        <input type="file" id="csvFile" accept=".csv" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300" />
+      </div>
+      <button id="processBtn" class="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition-colors">
+        Procesar
+      </button>
+      <button id="resetGroupBtn" class="w-full bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600 mt-2 transition-colors">
+        Reiniciar
+      </button>
+      <div id="groupDownloadSection" class="hidden mt-8">
+        <h3 class="text-xl font-bold mb-2">Archivos Generados</h3>
+        <ul id="groupDownloadList" class="list-disc pl-5 mb-4"></ul>
+        <button id="groupDownloadAllBtn" class="w-full bg-purple-500 text-white py-2 px-4 rounded hover:bg-purple-600 transition-colors">
           Descargar Todo
         </button>
       </div>
@@ -267,53 +226,30 @@
     <section id="acreditarSection" class="hidden">
       <h1 class="text-3xl font-bold mb-6">Acreditar FS por juego y moneda</h1>
       <p class="mb-6 leading-relaxed">
-        Selecciona varios archivos CSV (sin encabezado) para unificarlos y 
-        agruparlos por la columna de monedas (p. ej. VES, CLP, PEN, etc.). 
-        Después, selecciona un CSV que incluya <strong>Juego</strong>, <strong>Moneda</strong> y <strong>Día</strong>, 
-        para que el sistema pueda filtrar según el día de la semana y reagrupar la data 
-        por cada juego.
+        Selecciona varios archivos CSV (sin encabezado) para unificarlos y agruparlos por la columna de monedas (p. ej. VES, CLP, PEN, etc.). Después, selecciona un CSV que incluya <strong>Juego</strong>, <strong>Moneda</strong> y <strong>Día</strong>, para que el sistema pueda filtrar según el día de la semana y reagrupar la data por cada juego.
       </p>
-
       <!-- Selección de múltiples CSV con datos a acreditar -->
       <div class="mb-6">
         <label class="block mb-2 font-semibold">Archivos CSV de datos (sin encabezado):</label>
-        <input
-          type="file"
-          id="acreditarDataFiles"
-          multiple
-          accept=".csv"
-          class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300"
-        />
+        <input type="file" id="acreditarDataFiles" multiple accept=".csv" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300" />
       </div>
-
       <!-- Listado de archivos de datos a acreditar con opción de quitar -->
       <div class="mb-6">
         <h4 class="font-semibold mb-2">Archivos a acreditar:</h4>
         <ul id="acreditarFileList" class="list-disc pl-5 text-sm text-gray-600"></ul>
       </div>
-
       <!-- Selección del CSV que mapea Juego, Moneda y Día -->
       <div class="mb-6">
         <label class="block mb-2 font-semibold">CSV con Juego, Moneda y Día:</label>
-        <input
-          type="file"
-          id="juegoCurrencyFile"
-          accept=".csv"
-          class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300"
-        />
+        <input type="file" id="juegoCurrencyFile" accept=".csv" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300" />
         <p class="text-xs text-gray-500 mt-1">
-          Este CSV se guardará en el navegador hasta que lo actualices. 
-          Formato de columnas (sin encabezado): <em>juego, moneda, día</em>.
+          Este CSV se guardará en el navegador hasta que lo actualices. Formato de columnas (sin encabezado): <em>juego, moneda, día</em>.
         </p>
       </div>
-
-      <!-- NUEVO: Selección del día de la semana -->
+      <!-- Selección del día de la semana -->
       <div class="mb-6">
         <label for="selectWeekDay" class="block mb-2 font-semibold">Selecciona el día de la semana:</label>
-        <select
-          id="selectWeekDay"
-          class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300"
-        >
+        <select id="selectWeekDay" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300">
           <option value="0">Domingo</option>
           <option value="1">Lunes</option>
           <option value="2">Martes</option>
@@ -323,28 +259,16 @@
           <option value="6">Sábado</option>
         </select>
       </div>
-
-      <button
-        id="acreditarProcessBtn"
-        class="w-full bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 transition-colors"
-      >
+      <button id="acreditarProcessBtn" class="w-full bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 transition-colors">
         Procesar
       </button>
-
-      <button
-        id="resetAcreditarBtn"
-        class="w-full bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600 mt-2 transition-colors"
-      >
+      <button id="resetAcreditarBtn" class="w-full bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600 mt-2 transition-colors">
         Reiniciar
       </button>
-
       <div id="acreditarDownloadSection" class="hidden mt-8">
         <h3 class="text-xl font-bold mb-2">Archivos Generados</h3>
         <ul id="acreditarResultList" class="list-disc pl-5 mb-4"></ul>
-        <button
-          id="acreditarDownloadAllBtn"
-          class="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition-colors"
-        >
+        <button id="acreditarDownloadAllBtn" class="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition-colors">
           Descargar Todo
         </button>
       </div>
@@ -352,22 +276,33 @@
 
   </div><!-- Fin contenedor principal -->
 
+  <!-- Slider de modo diurno/nocturno -->
+  <div class="fixed top-4 right-4 z-50">
+    <label class="flex items-center cursor-pointer">
+      <div class="relative">
+        <input type="checkbox" id="themeToggle" class="sr-only" />
+        <div class="w-10 h-4 bg-gray-400 rounded-full shadow-inner"></div>
+        <div class="dot absolute w-6 h-6 bg-white rounded-full shadow -left-1 -top-1 transition"></div>
+      </div>
+      <span class="ml-3 text-gray-700" id="themeLabel">Modo Nocturno</span>
+    </label>
+  </div>
+
+  <!-- Footer: textos en esquina inferior derecha -->
+  <div class="fixed bottom-4 right-4 text-gray-500 opacity-80 text-sm text-right">
+    <div>Gerencia de Producto</div>
+    <div>Departamento de Retención</div>
+  </div>
+
   <script>
     // ====== Funciones de utilidad ======
-
-    // Formatear fecha en YYYY_MM_DD
     const formatDate = () => {
       const today = new Date();
-      return (
-        today.getFullYear() +
-        "_" +
-        String(today.getMonth() + 1).padStart(2, "0") +
-        "_" +
-        String(today.getDate()).padStart(2, "0")
-      );
+      return today.getFullYear() + "_" +
+             String(today.getMonth() + 1).padStart(2, "0") + "_" +
+             String(today.getDate()).padStart(2, "0");
     };
 
-    // Convierte un array bidimensional en CSV (sin encabezados)
     const arrayToCSV = (rows) => {
       return rows.map((cols) => cols.join(",")).join("\n");
     };
@@ -375,28 +310,28 @@
     // ====== Control de navegación ======
     document.querySelectorAll("nav button").forEach((btn) => {
       btn.addEventListener("click", () => {
-        document.querySelectorAll('section[id$="Section"]').forEach((section) => {
+        document.querySelectorAll('section[id$="Section"], section[id$="section"]').forEach((section) => {
           section.classList.add("hidden");
         });
-        const sectionId = btn.id.replace("nav", "").toLowerCase() + "Section";
+        // Para "Agrupar por" se utiliza el id "groupbySection"
+        const btnId = btn.id;
+        let sectionId = "";
+        if (btnId === "navGroupBy") {
+          sectionId = "groupbySection";
+        } else {
+          sectionId = btnId.replace("nav", "").toLowerCase() + "Section";
+        }
         document.getElementById(sectionId).classList.remove("hidden");
       });
     });
 
     // ====== Variables globales ======
-    // -- Mensajería interna e Email
-    let restrictLines = true; 
+    let mergeFiles = [];
+    let acreditarDataRows = [];
+    let acreditarFiles = [];
+    let juegoCurrencyContent = "";
+    let gameCurrencyMap = {};
 
-    // -- Unificar
-    let mergeFiles = []; 
-
-    // -- Acreditar FS
-    let acreditarDataRows = [];    // Se recalculará a partir de los archivos cargados
-    let acreditarFiles = [];       // Almacena los archivos de datos (con sus filas)
-    let juegoCurrencyContent = ""; // Se almacena (y persiste) en localStorage
-    let gameCurrencyMap = {};      // Estructura: { juego: Set(moneda1, moneda2, ...) }
-
-    // ====== Cargar CSV de juego-moneda-día desde localStorage (si existe) ======
     window.addEventListener("load", () => {
       const storedCSV = localStorage.getItem("gameCurrencyCSV");
       if (storedCSV) {
@@ -405,58 +340,36 @@
       }
     });
 
-    // ====== SECCIÓN: Mensajería interna e Email ======
-
-    // Toggle para restricción
-    const restrictToggle = document.getElementById("restrictToggle");
-    const restrictLabel = document.getElementById("restrictLabel");
-    restrictToggle.addEventListener("change", (e) => {
-      restrictLines = e.target.checked;
-      restrictLabel.textContent = restrictLines
-        ? "Con restricción"
-        : "Sin restricción";
+    // ================================
+    // SECCIÓN: Mensajería interna e Email
+    // ================================
+    document.getElementById("fileNamingGroup").addEventListener("change", (e) => {
+      const value = e.target.value;
+      const customFileNameGroup = document.getElementById("customFileNameGroup");
+      if (value === "custom") {
+        customFileNameGroup.classList.remove("hidden");
+      } else {
+        customFileNameGroup.classList.add("hidden");
+      }
     });
 
-    // Mostrar/ocultar campo personalizado para archivos
-    document
-      .getElementById("fileNamingGroup")
-      .addEventListener("change", (e) => {
-        const value = e.target.value;
-        const customFileNameGroup = document.getElementById("customFileNameGroup");
-        if (value === "custom") {
-          customFileNameGroup.classList.remove("hidden");
-        } else {
-          customFileNameGroup.classList.add("hidden");
-        }
-        // Si se selecciona "mensajeria_interna", forzar restricción
-        if (value === "mensajeria_interna") {
-          restrictToggle.checked = true;
-          restrictLines = true;
-          restrictLabel.textContent = "Con restricción";
-        }
-      });
+    document.getElementById("folderNamingGroup").addEventListener("change", (e) => {
+      const value = e.target.value;
+      const customFolderNameGroup = document.getElementById("customFolderNameGroup");
+      if (value === "custom") {
+        customFolderNameGroup.classList.remove("hidden");
+      } else {
+        customFolderNameGroup.classList.add("hidden");
+      }
+    });
 
-    // Mostrar/ocultar campo personalizado para carpeta
-    document
-      .getElementById("folderNamingGroup")
-      .addEventListener("change", (e) => {
-        const value = e.target.value;
-        const customFolderNameGroup = document.getElementById("customFolderNameGroup");
-        if (value === "custom") {
-          customFolderNameGroup.classList.remove("hidden");
-        } else {
-          customFolderNameGroup.classList.add("hidden");
-        }
-      });
-
-    // Procesar archivo CSV (Mensajería interna e Email)
     document.getElementById("processBtn").addEventListener("click", async () => {
       const file = document.getElementById("csvFile").files[0];
       if (!file) return alert("Selecciona un archivo CSV");
 
       const text = (await file.text()).trim();
-      const rows = text.split("\n").filter((row) => row.trim() !== "");
-      const headers = rows.shift().split(",").map((h) => h.trim());
+      const rows = text.split("\n").filter(row => row.trim() !== "");
+      const headers = rows.shift().split(",").map(h => h.trim());
       const currencyIndex = headers.indexOf("currency_iso");
       const userIdIndex = headers.indexOf("user_id");
 
@@ -466,7 +379,7 @@
 
       const groups = {};
       rows.forEach((row) => {
-        const cols = row.split(",").map((c) => c.trim());
+        const cols = row.split(",").map(c => c.trim());
         if (cols.length > Math.max(currencyIndex, userIdIndex)) {
           const currency = cols[currencyIndex];
           const userId = cols[userIdIndex];
@@ -477,7 +390,6 @@
         }
       });
 
-      // Determinar el nombre de la carpeta
       const folderNamingOption = document.getElementById("folderNamingGroup").value;
       const customFolderName = document.getElementById("customFolderNameGroup").value;
       let folderName = "";
@@ -491,20 +403,20 @@
 
       const zip = new JSZip();
       const folder = zip.folder(folderName);
-
-      // Determinar el nombre de archivo
       const namingOption = document.getElementById("fileNamingGroup").value;
       const customName = document.getElementById("customFileNameGroup").value;
+      let chunkSize = parseInt(document.getElementById("emailRestrictInput").value, 10);
+      if (chunkSize === 0) {
+        // Sin restricción: todo el grupo en un solo archivo
+        chunkSize = Infinity;
+      }
 
       Object.entries(groups).forEach(([currency, users]) => {
-        // Dividir en chunks si restrictLines está activo
-        const chunkSize = 899;
-        const chunks = restrictLines
-          ? Array.from({ length: Math.ceil(users.length / chunkSize) }, (_, i) =>
+        const chunks = (chunkSize === Infinity)
+          ? [users]
+          : Array.from({ length: Math.ceil(users.length / chunkSize) }, (_, i) =>
               users.slice(i * chunkSize, (i + 1) * chunkSize)
-            )
-          : [users];
-
+            );
         chunks.forEach((chunk, i) => {
           let fileName = "";
           if (namingOption === "mensajeria_interna") {
@@ -512,7 +424,6 @@
           } else if (namingOption === "email") {
             fileName = `${currency}_EMAIL_${formatDate()}_${i + 1}.csv`;
           } else {
-            // Personalizado
             fileName = `${customName.replace(/[^a-z0-9]/gi, "_")}_${currency}_${formatDate()}_${i + 1}.csv`;
           }
           const content = ["user_id", ...chunk].join("\n").trim();
@@ -527,21 +438,14 @@
       link.click();
     });
 
-    // Botón "Reiniciar" (Mensajería interna e Email)
-    document.getElementById("resetGroupBtn").addEventListener("click", () => {
-      resetSection("groupSection");
-    });
-
-    // ====== SECCIÓN: Unificar ======
-
+    // ================================
+    // SECCIÓN: Unificar
+    // ================================
     document.getElementById("fileNamingMerge").addEventListener("change", function () {
       const isCustom = this.value === "custom";
-      document
-        .getElementById("customFileNameMerge")
-        .classList.toggle("hidden", !isCustom);
+      document.getElementById("customFileNameMerge").classList.toggle("hidden", !isCustom);
     });
 
-    // Agregar archivos a la lista de unificar y permitir quitarlos
     const mergeFilesInput = document.getElementById("mergeFilesInput");
     mergeFilesInput.addEventListener("change", async (e) => {
       const files = Array.from(e.target.files);
@@ -550,7 +454,6 @@
         mergeFiles.push({ name: file.name, content });
       }
       actualizarListaArchivosMerge();
-      // Limpia el input para permitir volver a abrir el diálogo sin sobreescribir
       e.target.value = "";
     });
 
@@ -559,12 +462,12 @@
       list.innerHTML = "";
       mergeFiles.forEach((file, index) => {
         const li = document.createElement("li");
-        li.className = "mb-1 flex justify-between items-center";
+        li.className = "mb-1 flex items-center";
         const spanName = document.createElement("span");
         spanName.textContent = file.name;
         const removeBtn = document.createElement("span");
-        removeBtn.textContent = "x";
-        removeBtn.className = "text-red-500 cursor-pointer hover:text-red-700 ml-2";
+        removeBtn.textContent = "×";
+        removeBtn.className = "text-red-500 text-xl cursor-pointer hover:text-red-700 ml-1";
         removeBtn.addEventListener("click", () => {
           mergeFiles.splice(index, 1);
           actualizarListaArchivosMerge();
@@ -575,7 +478,6 @@
       });
     }
 
-    // Unificar archivos
     document.getElementById("mergeBtn").addEventListener("click", async () => {
       if (mergeFiles.length < 2) {
         alert("Selecciona al menos 2 archivos para unificar (o uno con varias selecciones).");
@@ -584,15 +486,12 @@
       try {
         const namingOption = document.getElementById("fileNamingMerge").value;
         const customName = document.getElementById("customFileNameMerge").value;
-
-        // Unir todo el contenido
         const mergedContent = mergeFiles
-          .map((file) => file.content.replace(/(\r\n|\n|\r)+/g, "\n").trim())
+          .map(file => file.content.replace(/(\r\n|\n|\r)+/g, "\n").trim())
           .join("\n")
           .replace(/(\r\n|\n|\r)+/g, "\n")
           .trim();
 
-        // Definir nombre final
         let fileName = "";
         if (namingOption === "unificado") {
           fileName = `UNIFICADO_${formatDate()}.csv`;
@@ -600,7 +499,6 @@
           fileName = `${customName.replace(/[^a-z0-9]/gi, "_")}.csv`;
         }
 
-        // Crear archivo y forzar descarga
         const blob = new Blob([mergedContent], { type: "text/csv" });
         const link = document.createElement("a");
         link.href = URL.createObjectURL(blob);
@@ -613,29 +511,32 @@
       }
     });
 
-    // Botón "Reiniciar" Unificar
     document.getElementById("resetMergeBtn").addEventListener("click", () => {
       resetSection("mergeSection");
     });
 
-    // ====== SECCIÓN: Dividir ======
+    // ================================
+    // SECCIÓN: Dividir
+    // ================================
     document.getElementById("splitBtn").addEventListener("click", async () => {
       const file = document.getElementById("splitFile").files[0];
       if (!file) return alert("Selecciona un archivo para dividir.");
 
       const text = (await file.text()).trim();
-      const rows = text.split("\n").filter((row) => row.trim() !== "");
+      const rows = text.split("\n").filter(row => row.trim() !== "");
       const baseName = document.getElementById("baseFileName").value || "ARCHIVO_DIVIDIDO";
+      let chunkSize = parseInt(document.getElementById("splitRestrictInput").value, 10);
+      if (chunkSize === 0) {
+        // Sin restricción: un solo archivo
+        chunkSize = rows.length;
+      }
 
       const zip = new JSZip();
       const folderName = `DIVIDIDO_${formatDate()}`;
       const folder = zip.folder(folderName);
 
-      // Tomar la primera fila como encabezado
       const header = rows.shift();
-      const chunkSize = 899;
       let chunkNumber = 1;
-
       while (rows.length > 0) {
         const chunk = rows.splice(0, chunkSize);
         const fileName = `${baseName.replace(/[^a-z0-9]/gi, "_")}_${chunkNumber}.csv`;
@@ -651,25 +552,189 @@
       link.click();
     });
 
-    // Botón "Reiniciar" Dividir
     document.getElementById("resetSplitBtn").addEventListener("click", () => {
       resetSection("splitSection");
     });
 
-    // ====== SECCIÓN: Acreditar FS por juego y moneda ======
+    // ================================
+    // SECCIÓN: Agrupar por
+    // ================================
+    document.getElementById("groupByIndividualBtn").addEventListener("click", async () => {
+      const fileInput = document.getElementById("groupByCSV");
+      if (fileInput.files.length === 0) {
+        alert("Selecciona un archivo CSV para agrupar.");
+        return;
+      }
+      const file = fileInput.files[0];
+      const text = await file.text();
+      const rows = text.split("\n").filter(row => row.trim() !== "");
+      if (rows.length < 1) {
+         alert("El archivo CSV está vacío.");
+         return;
+      }
+      const header = rows[0].split(",").map(s => s.trim());
+      const groupField = document.getElementById("groupByField").value.trim();
+      if (!groupField) {
+         alert("Ingresa el campo por el cual agrupar.");
+         return;
+      }
+      const groupIndex = header.findIndex(h => h.toLowerCase() === groupField.toLowerCase());
+      if (groupIndex === -1) {
+         alert("El campo de agrupación no se encontró en el CSV.");
+         return;
+      }
+      // Opcional: campos a exportar
+      const exportFieldsInput = document.getElementById("exportFields").value.trim();
+      let exportIndices = null;
+      if (exportFieldsInput !== "") {
+         const exportFields = exportFieldsInput.split(",").map(f => f.trim().toLowerCase());
+         exportIndices = exportFields.map(field => header.findIndex(h => h.toLowerCase() === field)).filter(index => index !== -1);
+         if (exportIndices.length === 0) {
+            alert("Ninguno de los campos a exportar se encontró en el CSV.");
+            return;
+         }
+      }
+      const finalHeader = exportIndices ? exportIndices.map(i => header[i]) : header;
+      // Agrupar las filas (omitimos el encabezado)
+      const grouping = {};
+      for (let i = 1; i < rows.length; i++){
+           const rowCols = rows[i].split(",").map(s => s.trim());
+           const key = rowCols[groupIndex] || "sin_valor";
+           if (!grouping[key]) grouping[key] = [];
+           grouping[key].push(rowCols);
+      }
+      const downloadList = document.getElementById("groupByDownloadList");
+      downloadList.innerHTML = "";
+      const dateStr = formatDate();
+      const baseName = document.getElementById("groupByFileName").value.trim();
+      let groupRestrict = parseInt(document.getElementById("groupByRestrictInput").value, 10);
+      // Si el usuario selecciona 0, no se establece restricción (todo en un solo archivo)
+      for (const groupValue in grouping) {
+           const groupRows = grouping[groupValue];
+           if (groupRestrict === 0) groupRestrict = groupRows.length;
+           const chunks = [];
+           for (let i = 0; i < groupRows.length; i += groupRestrict) {
+             chunks.push(groupRows.slice(i, i + groupRestrict));
+           }
+           chunks.forEach((chunk, index) => {
+             const fileName = baseName ? `${baseName}_${groupValue}_${groupField}_${dateStr}${chunks.length > 1 ? "_" + (index+1) : ""}.csv` : `${groupValue}_${groupField}_${dateStr}${chunks.length > 1 ? "_" + (index+1) : ""}.csv`;
+             let content = finalHeader.join(",") + "\n";
+             chunk.forEach(row => {
+               const finalRow = exportIndices ? exportIndices.map(i => row[i]) : row;
+               content += finalRow.join(",") + "\n";
+             });
+             const li = document.createElement("li");
+             li.className = "mb-1 flex items-center";
+             const spanName = document.createElement("span");
+             spanName.textContent = fileName;
+             const downloadBtn = document.createElement("button");
+             downloadBtn.className = "ml-2 bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600";
+             downloadBtn.textContent = "Descargar";
+             downloadBtn.addEventListener("click", () => {
+                const blob = new Blob([content], { type: "text/csv" });
+                const link = document.createElement("a");
+                link.href = URL.createObjectURL(blob);
+                link.download = fileName;
+                link.click();
+             });
+             li.appendChild(spanName);
+             li.appendChild(downloadBtn);
+             downloadList.appendChild(li);
+           });
+      }
+      document.getElementById("groupByDownloadSection").classList.remove("hidden");
+    });
 
-    // Agregar archivos de datos y permitir quitarlos
+    document.getElementById("groupByZipBtn").addEventListener("click", async () => {
+      const fileInput = document.getElementById("groupByCSV");
+      if (fileInput.files.length === 0) {
+        alert("Selecciona un archivo CSV para agrupar.");
+        return;
+      }
+      const file = fileInput.files[0];
+      const text = await file.text();
+      const rows = text.split("\n").filter(row => row.trim() !== "");
+      if (rows.length < 1) {
+         alert("El archivo CSV está vacío.");
+         return;
+      }
+      const header = rows[0].split(",").map(s => s.trim());
+      const groupField = document.getElementById("groupByField").value.trim();
+      if (!groupField) {
+         alert("Ingresa el campo por el cual agrupar.");
+         return;
+      }
+      const groupIndex = header.findIndex(h => h.toLowerCase() === groupField.toLowerCase());
+      if (groupIndex === -1) {
+         alert("El campo de agrupación no se encontró en el CSV.");
+         return;
+      }
+      const exportFieldsInput = document.getElementById("exportFields").value.trim();
+      let exportIndices = null;
+      if (exportFieldsInput !== "") {
+         const exportFields = exportFieldsInput.split(",").map(f => f.trim().toLowerCase());
+         exportIndices = exportFields.map(field => header.findIndex(h => h.toLowerCase() === field)).filter(index => index !== -1);
+         if (exportIndices.length === 0) {
+            alert("Ninguno de los campos a exportar se encontró en el CSV.");
+            return;
+         }
+      }
+      const finalHeader = exportIndices ? exportIndices.map(i => header[i]) : header;
+      const grouping = {};
+      for (let i = 1; i < rows.length; i++){
+           const rowCols = rows[i].split(",").map(s => s.trim());
+           const key = rowCols[groupIndex] || "sin_valor";
+           if (!grouping[key]) grouping[key] = [];
+           grouping[key].push(rowCols);
+      }
+      const zip = new JSZip();
+      const dateStr = formatDate();
+      const folderNameInput = document.getElementById("groupByFolderName").value.trim();
+      const folderName = folderNameInput ? `${folderNameInput}_${groupField}_${dateStr}` : `AGRUPAR_${groupField}_${dateStr}`;
+      const folder = zip.folder(folderName);
+      const baseName = document.getElementById("groupByFileName").value.trim();
+      let groupRestrict = parseInt(document.getElementById("groupByRestrictInput").value, 10);
+      for (const groupValue in grouping) {
+           const groupRows = grouping[groupValue];
+           if (groupRestrict === 0) groupRestrict = groupRows.length;
+           const chunks = [];
+           for (let i = 0; i < groupRows.length; i += groupRestrict) {
+             chunks.push(groupRows.slice(i, i + groupRestrict));
+           }
+           chunks.forEach((chunk, index) => {
+             const fileName = baseName ? `${baseName}_${groupValue}_${groupField}_${dateStr}${chunks.length > 1 ? "_" + (index+1) : ""}.csv` : `${groupValue}_${groupField}_${dateStr}${chunks.length > 1 ? "_" + (index+1) : ""}.csv`;
+             let content = finalHeader.join(",") + "\n";
+             chunk.forEach(row => {
+               const finalRow = exportIndices ? exportIndices.map(i => row[i]) : row;
+               content += finalRow.join(",") + "\n";
+             });
+             folder.file(fileName, content);
+           });
+      }
+      const blob = await zip.generateAsync({ type: "blob" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = `${folderName}.zip`;
+      link.click();
+    });
+
+    // Reiniciar la sección "Agrupar por"
+    document.getElementById("resetGroupByBtn").addEventListener("click", () => {
+      resetSection("groupbySection");
+    });
+
+    // ================================
+    // SECCIÓN: Acreditar FS por juego y moneda
+    // ================================
     const acreditarDataFilesInput = document.getElementById("acreditarDataFiles");
     acreditarDataFilesInput.addEventListener("change", async (e) => {
       const files = Array.from(e.target.files);
       for (const file of files) {
         const content = (await file.text()).trim();
-        // Convertir cada fila en array de columnas
-        const lines = content.split("\n").map((row) => row.split(",").map(c => c.trim()));
+        const lines = content.split("\n").map(row => row.split(",").map(c => c.trim()));
         acreditarFiles.push({ name: file.name, rows: lines });
       }
       actualizarListaAcreditar();
-      // Limpia el input para permitir agregar más
       e.target.value = "";
     });
 
@@ -678,12 +743,12 @@
       list.innerHTML = "";
       acreditarFiles.forEach((file, index) => {
         const li = document.createElement("li");
-        li.className = "mb-1 flex justify-between items-center";
+        li.className = "mb-1 flex items-center";
         const spanName = document.createElement("span");
         spanName.textContent = file.name;
         const removeBtn = document.createElement("span");
-        removeBtn.textContent = "x";
-        removeBtn.className = "text-red-500 cursor-pointer hover:text-red-700 ml-2";
+        removeBtn.textContent = "×";
+        removeBtn.className = "text-red-500 text-xl cursor-pointer hover:text-red-700 ml-1";
         removeBtn.addEventListener("click", () => {
           acreditarFiles.splice(index, 1);
           actualizarListaAcreditar();
@@ -694,20 +759,16 @@
       });
     }
 
-    // Cargar el CSV de juego, moneda y día (persistir en localStorage)
     document.getElementById("juegoCurrencyFile").addEventListener("change", async (e) => {
       const file = e.target.files[0];
       if (file) {
         juegoCurrencyContent = (await file.text()).trim();
-        // Guardar en localStorage
         localStorage.setItem("gameCurrencyCSV", juegoCurrencyContent);
         console.log("Nuevo CSV de juego-moneda-día guardado en localStorage.");
       }
     });
 
-    // Botón para procesar todo en Acreditar FS
     document.getElementById("acreditarProcessBtn").addEventListener("click", () => {
-      // Recalcular acreditarDataRows a partir de los archivos cargados
       acreditarDataRows = [];
       acreditarFiles.forEach(file => {
         acreditarDataRows.push(...file.rows);
@@ -720,9 +781,7 @@
         alert("No se ha cargado (o no existe) el CSV de Juego, Moneda y Día.");
         return;
       }
-      // 2.1) Parsear juego-moneda-día
       const rawData = parseGameCurrencyDayCSV(juegoCurrencyContent);
-      // Usar el día seleccionado en el desplegable (0=Domingo, 1=Lunes, ...)
       const selectedDay = parseInt(document.getElementById("selectWeekDay").value, 10);
       const dayFiltered = rawData.filter(d => parseInt(d.day) === selectedDay);
 
@@ -731,7 +790,6 @@
         return;
       }
 
-      // Construir gameCurrencyMap con los juegos/monedas vigentes para el día seleccionado
       gameCurrencyMap = {};
       dayFiltered.forEach(item => {
         if (!gameCurrencyMap[item.game]) {
@@ -740,26 +798,19 @@
         gameCurrencyMap[item.game].add(item.currency);
       });
 
-      // 3) Detectar cuál columna contiene la moneda
       const currencyIndex = detectCurrencyColumn(acreditarDataRows, gameCurrencyMap);
       if (currencyIndex === -1) {
         alert("No se pudo detectar la columna de moneda en los datos.");
         return;
       }
 
-      // 4) Agrupar datos por moneda
       const groupedByCurrency = groupDataByCurrency(acreditarDataRows, currencyIndex);
-
-      // 5) Para cada juego, tomar las monedas asociadas y unificar las filas
       const filesByGame = createFilesForGames(gameCurrencyMap, groupedByCurrency);
-
-      // 6) Mostrar resultados y permitir descarga
       mostrarResultadosAcreditar(filesByGame);
     });
 
-    // Parsear el CSV con columnas [juego, moneda, día]
     function parseGameCurrencyDayCSV(content) {
-      const lines = content.split("\n").map((row) => row.split(",").map(c => c.trim()));
+      const lines = content.split("\n").map(row => row.split(",").map(c => c.trim()));
       const data = [];
       for (let row of lines) {
         if (row.length < 3) continue;
@@ -769,41 +820,31 @@
       return data;
     }
 
-    // Detectar en qué columna está la moneda (según las definidas en gameCurrencyMap)
     function detectCurrencyColumn(rows, gameCurrencyMap) {
-      // Construir un set de todas las monedas posibles
       const allCurrencies = new Set();
-      Object.values(gameCurrencyMap).forEach((currencySet) => {
-        currencySet.forEach((c) => allCurrencies.add(c));
+      Object.values(gameCurrencyMap).forEach(currencySet => {
+        currencySet.forEach(c => allCurrencies.add(c));
       });
-      if (allCurrencies.size === 0) {
-        return -1; // No hay monedas definidas
-      }
-
+      if (allCurrencies.size === 0) return -1;
       const numColumns = rows[0].length;
       let bestColumnIndex = -1;
       let bestCount = 0;
-
       for (let col = 0; col < numColumns; col++) {
         let count = 0;
         for (const row of rows) {
-          if (allCurrencies.has(row[col])) {
-            count++;
-          }
+          if (allCurrencies.has(row[col])) count++;
         }
         if (count > bestCount) {
           bestCount = count;
           bestColumnIndex = col;
         }
       }
-      if (bestCount === 0) return -1;
-      return bestColumnIndex;
+      return bestCount === 0 ? -1 : bestColumnIndex;
     }
 
-    // Agrupar datos por moneda
     function groupDataByCurrency(rows, currencyIndex) {
       const map = {};
-      rows.forEach((cols) => {
+      rows.forEach(cols => {
         const currency = cols[currencyIndex];
         if (!map[currency]) map[currency] = [];
         map[currency].push(cols);
@@ -811,20 +852,17 @@
       return map;
     }
 
-    // Para cada juego en gameCurrencyMap, unir las filas de sus monedas
-    // y generar un archivo "ACREDITAR_{juego}_{moneda1_moneda2_...}.csv"
     function createFilesForGames(gameCurrencyMap, groupedByCurrency) {
       const result = [];
       for (const [game, currencySet] of Object.entries(gameCurrencyMap)) {
         let combinedRows = [];
         const currencyList = Array.from(currencySet);
-        currencyList.forEach((curr) => {
+        currencyList.forEach(curr => {
           if (groupedByCurrency[curr]) {
             combinedRows.push(...groupedByCurrency[curr]);
           }
         });
         if (combinedRows.length === 0) continue;
-
         const joinedCurrencies = currencyList.join("_");
         const safeGameName = game.replace(/[^a-zA-Z0-9]/g, "_");
         const fileName = `ACREDITAR_${safeGameName}_${joinedCurrencies}.csv`;
@@ -834,32 +872,24 @@
       return result;
     }
 
-    // Mostrar los resultados y permitir descarga
     function mostrarResultadosAcreditar(filesByGame) {
       const list = document.getElementById("acreditarResultList");
       list.innerHTML = "";
-
       if (!filesByGame || filesByGame.length === 0) {
         alert("No se generaron archivos para acreditar.");
         return;
       }
-
       filesByGame.forEach((f, i) => {
         const li = document.createElement("li");
         li.className = "mb-1";
         li.innerHTML = 
           `<span class="font-semibold">${f.fileName}</span>
-           <button
-            class="ml-3 bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
-            data-index="${i}"
-          >
+           <button class="ml-3 bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600" data-index="${i}">
             Descargar
-          </button>`;
+           </button>`;
         list.appendChild(li);
       });
-
-      // Descargar individual
-      list.querySelectorAll("button").forEach((btn) => {
+      list.querySelectorAll("button").forEach(btn => {
         btn.addEventListener("click", (e) => {
           const index = parseInt(e.target.dataset.index, 10);
           const { fileName, content } = filesByGame[index];
@@ -870,83 +900,84 @@
           link.click();
         });
       });
-
-      // Descargar todo en ZIP
-      document
-        .getElementById("acreditarDownloadAllBtn")
-        .addEventListener("click", async () => {
-          const zip = new JSZip();
-          const date = formatDate();
-          const folder = zip.folder(`ACREDITAR_FS_${date}`);
-
-          filesByGame.forEach(({ fileName, content }) => {
-            folder.file(fileName, content);
-          });
-
-          const blob = await zip.generateAsync({ type: "blob" });
-          const link = document.createElement("a");
-          link.href = URL.createObjectURL(blob);
-          link.download = `ACREDITAR_FS_${date}.zip`;
-          link.click();
-        });
-
       document.getElementById("acreditarDownloadSection").classList.remove("hidden");
     }
 
-    // Botón "Reiniciar" en Acreditar FS
     document.getElementById("resetAcreditarBtn").addEventListener("click", () => {
       resetSection("acreditarSection");
     });
 
-    // ====== Función de reinicio genérica ======
+    // ================================
+    // Función de reinicio genérica
+    // ================================
     const resetSection = (sectionId) => {
       const section = document.getElementById(sectionId);
-
-      // Limpiar inputs y selects de la sección
-      section
-        .querySelectorAll("input:not([type='button']), select")
-        .forEach((element) => {
+      section.querySelectorAll("input:not([type='button']), select").forEach(element => {
           if (element.type === "file") {
             element.value = "";
           } else if (element.type === "checkbox") {
             element.checked = true;
-          } else if (element.type === "text") {
-            element.value = "";
+          } else if (element.type === "text" || element.type === "number") {
+            element.value = element.getAttribute("value") || "";
           }
           if (element.tagName === "SELECT") {
             element.selectedIndex = 0;
             element.dispatchEvent(new Event("change"));
           }
-        });
-
-      // Ocultar secciones de descarga (si hay)
-      section
-        .querySelectorAll(".hidden")
-        .forEach((el) => el.classList.add("hidden"));
-
-      // Limpieza específica según la sección
-      if (sectionId === "groupSection") {
-        // Toggle por defecto: Con restricción
-        restrictLines = true;
-        restrictToggle.checked = true;
-        restrictLabel.textContent = "Con restricción";
-      } else if (sectionId === "mergeSection") {
+      });
+      section.querySelectorAll(".hidden").forEach(el => el.classList.add("hidden"));
+      if (sectionId === "mergeSection") {
         mergeFiles = [];
         document.getElementById("mergeFileList").innerHTML = "";
-      } else if (sectionId === "splitSection") {
-        // Nada especial que resetear
       } else if (sectionId === "acreditarSection") {
         acreditarFiles = [];
         acreditarDataRows = [];
         document.getElementById("acreditarFileList").innerHTML = "";
-        // El CSV de juego-moneda-día queda guardado en localStorage
-        // Si deseas borrarlo también, descomenta la línea siguiente:
-        // localStorage.removeItem("gameCurrencyCSV");
-        // juegoCurrencyContent = "";
-        // gameCurrencyMap = {};
         document.getElementById("acreditarResultList").innerHTML = "";
+      } else if (sectionId === "groupbySection") {
+        document.getElementById("groupByDownloadList").innerHTML = "";
       }
     };
+
+    // ================================
+    // Sincronizar sliders y campos numéricos
+    // ================================
+    // Para Mensajería interna e Email
+    document.getElementById("emailRestrictSlider").addEventListener("input", function(){
+      document.getElementById("emailRestrictInput").value = this.value;
+    });
+    document.getElementById("emailRestrictInput").addEventListener("change", function(){
+      document.getElementById("emailRestrictSlider").value = this.value;
+    });
+    // Para Agrupar por
+    document.getElementById("groupByRestrictSlider").addEventListener("input", function(){
+      document.getElementById("groupByRestrictInput").value = this.value;
+    });
+    document.getElementById("groupByRestrictInput").addEventListener("change", function(){
+      document.getElementById("groupByRestrictSlider").value = this.value;
+    });
+    // Para Dividir
+    document.getElementById("splitRestrictSlider").addEventListener("input", function(){
+      document.getElementById("splitRestrictInput").value = this.value;
+    });
+    document.getElementById("splitRestrictInput").addEventListener("change", function(){
+      document.getElementById("splitRestrictSlider").value = this.value;
+    });
+
+    // ================================
+    // Slider para modo diurno/nocturno
+    // ================================
+    const themeToggle = document.getElementById("themeToggle");
+    const themeLabel = document.getElementById("themeLabel");
+    themeToggle.addEventListener("change", (e) => {
+      if (e.target.checked) {
+        document.body.classList.add("dark");
+        themeLabel.textContent = "Modo Diurno";
+      } else {
+        document.body.classList.remove("dark");
+        themeLabel.textContent = "Modo Nocturno";
+      }
+    });
   </script>
 </body>
 </html>

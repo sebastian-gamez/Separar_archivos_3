@@ -63,6 +63,18 @@
 <body class="bg-white text-gray-800 min-h-screen">
   <!-- Contenedor principal -->
   <div class="container mx-auto px-4 py-8">
+    <!-- Desplegable para seleccionar sección (parte superior izquierda) -->
+    <div class="mb-4">
+      <select id="sectionDropdown" class="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300">
+        <option value="">Selecciona sección</option>
+        <option value="mergeSection">Unificar Archivos</option>
+        <option value="splitSection">Dividir Archivo</option>
+        <option value="groupbySection">Agrupar por</option>
+        <option value="groupSection">Mensajería interna e Email</option>
+        <option value="acreditarSection">Acreditar FS por juego y moneda</option>
+      </select>
+    </div>
+    
     <!-- Navegación principal -->
     <nav class="flex flex-wrap items-center justify-center gap-6 mb-10 text-sm font-semibold">
       <button id="navMerge" class="text-gray-600 hover:text-black focus:outline-none">Unificar</button>
@@ -203,7 +215,10 @@
 
     <!-- ================================
          SECCIÓN: Mensajería interna e Email
-         ================================ -->
+         ================================
+         Carga uno o varios archivos CSV, agrupa los registros por <code>currency_iso</code> y genera archivos
+         con el nombre y carpeta elegidos. Se dividirán los archivos según el intervalo de líneas especificado.
+    -->
     <section id="groupSection" class="hidden">
       <h1 class="text-3xl font-bold mb-6">Mensajería interna e Email</h1>
       <p class="mb-6 leading-relaxed">
@@ -351,6 +366,14 @@
         document.getElementById(sectionId).classList.remove("hidden");
       });
     });
+    // Evento para el desplegable de secciones (parte superior izquierda)
+    document.getElementById("sectionDropdown").addEventListener("change", function() {
+      const sectionId = this.value;
+      if(sectionId) {
+        document.querySelectorAll('section[id$="Section"], section[id$="section"]').forEach(section => section.classList.add("hidden"));
+        document.getElementById(sectionId).classList.remove("hidden");
+      }
+    });
 
     // ====== Variables globales ======
     let groupFiles = [];
@@ -410,7 +433,7 @@
         list.appendChild(li);
       });
     }
-    // Agregar listener para habilitar input de nombre personalizado en Unificar Archivos
+    // Habilitar input de nombre personalizado en Unificar Archivos
     document.getElementById("fileNamingMerge").addEventListener("change", function() {
       if(this.value === "custom"){
         document.getElementById("customFileNameMerge").classList.remove("hidden");
@@ -823,10 +846,10 @@
         console.log("Nuevo CSV de juego-moneda-día guardado en localStorage.");
       }
     });
-    // Modificación: usar readAsDataURL para guardar imágenes en formato base64 y persistirlas
+    // Guardar imágenes usando readAsDataURL y persistirlas
     const gameImagesInput = document.getElementById("gameImagesInput");
     gameImagesInput.addEventListener("change", async (e) => {
-      // No se reinicializa gameImages, se agregan las nuevas imágenes a las ya guardadas
+      // Se agregan las nuevas imágenes sin reinicializar gameImages
       const files = Array.from(e.target.files);
       for (const file of files) {
         const nameWithoutExt = file.name.replace(/\.[^/.]+$/, "").toLowerCase();
@@ -887,11 +910,14 @@
       const zip = new JSZip();
       const date = formatDate();
       const folder = zip.folder(`ACREDITAR_FS_${date}`);
-      // Agregar imágenes: para cada juego en gameCurrencyMap, se busca si existe una imagen cuyo nombre (minúsculas) coincida
+      // Agregar imágenes: para cada juego en gameCurrencyMap, se verifica si existe una imagen cuyo nombre coincida (sin alterar su formato JPG/PNG)
       if(Object.keys(gameImages).length > 0){
         Object.keys(gameCurrencyMap).forEach(gameKey => {
           if(gameImages[gameKey]){
-            folder.file(gameImages[gameKey].name, gameImages[gameKey].content);
+            const dataURL = gameImages[gameKey].content;
+            // Extraer la parte base64 del data URL y pasar la opción base64: true
+            const base64Data = dataURL.split(',')[1];
+            folder.file(gameImages[gameKey].name, base64Data, {base64: true});
           }
         });
       }

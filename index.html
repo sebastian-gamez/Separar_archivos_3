@@ -9,12 +9,49 @@
   <!-- JSZip -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <style>
-    /* Estilos para el modo nocturno */
+    /* Modo nocturno: se aplican estilos a inputs, selects y textarea, pero no a botones */
     body.dark {
-      background-color: #1a202c;
+      background-color: #1a202c !important;
+      color: #f7fafc !important;
+    }
+    body.dark input,
+    body.dark select,
+    body.dark textarea {
+      background-color: #2d3748 !important;
+      color: #f7fafc !important;
+      border-color: #4a5568 !important;
+    }
+    body.dark code {
+      background-color: #4a5568;
       color: #f7fafc;
     }
-    /* Ajustes para el slider de tema */
+    /* Estilos para archivos adjuntos: lista con botón de eliminación */
+    .file-item {
+      position: relative;
+      padding-right: 1.5rem;
+      cursor: default;
+    }
+    .remove-file {
+      position: absolute;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      margin: auto;
+      height: 1rem;
+      width: 1rem;
+      background-color: #e11d48;
+      color: white;
+      border-radius: 9999px;
+      text-align: center;
+      line-height: 1rem;
+      font-size: 0.75rem;
+      display: none;
+      cursor: pointer;
+    }
+    .file-item:hover .remove-file {
+      display: block;
+    }
+    /* Slider de tema */
     .dot {
       transition: transform 0.3s ease;
     }
@@ -26,30 +63,22 @@
 <body class="bg-white text-gray-800 min-h-screen">
   <!-- Contenedor principal -->
   <div class="container mx-auto px-4 py-8">
-    <!-- Navegación principal en el orden requerido -->
+    <!-- Navegación principal -->
     <nav class="flex flex-wrap items-center justify-center gap-6 mb-10 text-sm font-semibold">
-      <button id="navMerge" class="text-gray-600 hover:text-black focus:outline-none">
-        Unificar
-      </button>
-      <button id="navSplit" class="text-gray-600 hover:text-black focus:outline-none">
-        Dividir
-      </button>
-      <button id="navGroupBy" class="text-gray-600 hover:text-black focus:outline-none">
-        Agrupar por
-      </button>
-      <button id="navGroup" class="text-gray-600 hover:text-black focus:outline-none">
-        Mensajería interna e Email
-      </button>
-      <button id="navAcreditar" class="text-gray-600 hover:text-black focus:outline-none">
-        Acreditar FS por juego y moneda
-      </button>
+      <button id="navMerge" class="text-gray-600 hover:text-black focus:outline-none">Unificar</button>
+      <button id="navSplit" class="text-gray-600 hover:text-black focus:outline-none">Dividir</button>
+      <button id="navGroupBy" class="text-gray-600 hover:text-black focus:outline-none">Agrupar por</button>
+      <button id="navGroup" class="text-gray-600 hover:text-black focus:outline-none">Mensajería interna e Email</button>
+      <button id="navAcreditar" class="text-gray-600 hover:text-black focus:outline-none">Acreditar FS por juego y moneda</button>
     </nav>
 
-    <!-- SECCIÓN: Unificar -->
+    <!-- ================================
+         SECCIÓN: Unificar
+         ================================ -->
     <section id="mergeSection" class="hidden">
       <h1 class="text-3xl font-bold mb-6">Unificar Archivos</h1>
       <p class="mb-6 leading-relaxed">
-        Carga todos los archivos CSV que desees unificar. Puedes seleccionarlos todos de una sola vez o ir agregándolos uno a uno. Al final, el sistema los unirá en un solo archivo.
+        Carga todos los archivos CSV que desees unificar. Puedes seleccionarlos de una sola vez o ir agregándolos uno a uno. Al final, el sistema los unirá en un solo archivo.
       </p>
       <!-- Nombre del archivo unificado -->
       <div class="mb-6">
@@ -65,30 +94,26 @@
         <label class="block mb-2 font-semibold">Selecciona archivos CSV:</label>
         <input type="file" id="mergeFilesInput" multiple accept=".csv" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300" />
       </div>
-      <!-- Lista de archivos con opción de eliminar -->
+      <!-- Lista de archivos seleccionados -->
       <div class="mb-6">
         <h4 class="font-semibold mb-2">Archivos a unificar:</h4>
         <ul id="mergeFileList" class="list-disc pl-5 text-sm text-gray-600"></ul>
       </div>
-      <button id="mergeBtn" class="w-full bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 transition-colors">
-        Unificar
-      </button>
-      <button id="resetMergeBtn" class="w-full bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600 mt-2 transition-colors">
-        Reiniciar
-      </button>
+      <button id="mergeBtn" class="w-full bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 transition-colors">Unificar</button>
+      <button id="resetMergeBtn" class="w-full bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600 mt-2 transition-colors">Reiniciar</button>
       <div id="mergeDownloadSection" class="hidden mt-8">
         <h3 class="text-xl font-bold mb-2">Archivo Unificado</h3>
-        <button id="mergeDownloadBtn" class="w-full bg-yellow-500 text-white py-2 px-4 rounded hover:bg-yellow-600 transition-colors">
-          Descargar
-        </button>
+        <button id="mergeDownloadBtn" class="w-full bg-yellow-500 text-white py-2 px-4 rounded hover:bg-yellow-600 transition-colors">Descargar</button>
       </div>
     </section>
 
-    <!-- SECCIÓN: Dividir -->
+    <!-- ================================
+         SECCIÓN: Dividir
+         ================================ -->
     <section id="splitSection" class="hidden">
       <h1 class="text-3xl font-bold mb-6">Dividir Archivo</h1>
       <p class="mb-6 leading-relaxed">
-        Divide un archivo CSV en partes. Se conservará la primera fila como encabezado en cada parte.
+        Divide un archivo CSV en partes. Se conservará la primera fila (cabecera) en cada parte.
       </p>
       <div class="mb-6">
         <input type="file" id="splitFile" accept=".csv" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300" />
@@ -96,37 +121,40 @@
       <div class="mb-6">
         <input type="text" id="baseFileName" placeholder="Nombre base para los archivos" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300" />
       </div>
-      <!-- Slider para definir cantidad de líneas por archivo (Dividir) -->
+      <!-- Slider para definir cantidad de líneas -->
       <div class="flex flex-col md:flex-row items-center mb-6">
         <label for="splitRestrictSlider" class="font-medium mr-4">Líneas por archivo:</label>
         <input type="range" id="splitRestrictSlider" min="0" max="10000" value="899" class="mr-2">
         <input type="number" id="splitRestrictInput" min="0" class="w-20 border border-gray-300 rounded px-2 py-1" value="899">
         <span class="ml-2 text-sm text-gray-500">(0 = sin restricción)</span>
       </div>
-      <button id="splitBtn" class="w-full bg-yellow-500 text-white py-2 px-4 rounded hover:bg-yellow-600 transition-colors">
-        Dividir
-      </button>
-      <button id="resetSplitBtn" class="w-full bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600 mt-2 transition-colors">
-        Reiniciar
-      </button>
+      <button id="splitBtn" class="w-full bg-yellow-500 text-white py-2 px-4 rounded hover:bg-yellow-600 transition-colors">Dividir</button>
+      <button id="resetSplitBtn" class="w-full bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600 mt-2 transition-colors">Reiniciar</button>
       <div id="splitDownloadSection" class="hidden mt-8">
         <h3 class="text-xl font-bold mb-2">Archivos Divididos</h3>
         <ul id="splitDownloadList" class="list-disc pl-5 mb-4"></ul>
-        <button id="splitDownloadAllBtn" class="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition-colors">
-          Descargar Todo
-        </button>
+        <button id="splitDownloadAllBtn" class="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition-colors">Descargar Todo en ZIP</button>
       </div>
     </section>
 
-    <!-- SECCIÓN: Agrupar por -->
+    <!-- ================================
+         SECCIÓN: Agrupar por
+         ================================
+         Permite cargar varios CSV, seleccionar el campo para agrupar, definir (opcionalmente)
+         los campos a exportar y personalizar los nombres; luego se muestran los archivos procesados
+         con botón individual para descargar y un botón para descargarlos todos.
+    -->
     <section id="groupbySection" class="hidden">
       <h1 class="text-3xl font-bold mb-6">Agrupar por</h1>
       <p class="mb-6 leading-relaxed">
-        Carga un archivo CSV, ingresa el campo por el cual deseas agrupar, define los campos a exportar (opcional) y personaliza los nombres de exportación. Se generarán archivos CSV para cada grupo (divididos si exceden el número de líneas establecido) que podrás descargar individualmente o como un ZIP.
+        Selecciona uno o varios archivos CSV, ingresa el campo por el cual deseas agrupar, define (opcionalmente)
+        los campos a exportar y personaliza los nombres de exportación. Se generarán archivos CSV para cada grupo.
       </p>
+      <!-- Selección múltiple de archivos CSV -->
       <div class="mb-6">
-        <label for="groupByCSV" class="block mb-2 font-semibold">Archivo CSV a agrupar:</label>
-        <input type="file" id="groupByCSV" accept=".csv" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300" />
+        <label for="groupByCSV" class="block mb-2 font-semibold">Archivo(s) CSV a agrupar:</label>
+        <input type="file" id="groupByCSV" multiple accept=".csv" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300" />
+        <ul id="groupByFileList" class="list-disc pl-5 text-sm text-gray-600"></ul>
       </div>
       <div class="mb-6">
         <label for="groupByField" class="block mb-2 font-semibold">Campo para agrupar:</label>
@@ -145,7 +173,7 @@
         <label for="exportFields" class="block mb-2 font-semibold">Campos a exportar (separados por coma):</label>
         <input type="text" id="exportFields" placeholder="Ejemplo: currency, amount" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300" />
       </div>
-      <!-- Slider para definir cantidad de líneas por archivo en Agrupar por -->
+      <!-- Slider para definir cantidad de líneas -->
       <div class="flex flex-col md:flex-row items-center mb-6">
         <label for="groupByRestrictSlider" class="font-medium mr-4">Líneas por archivo:</label>
         <input type="range" id="groupByRestrictSlider" min="0" max="10000" value="899" class="mr-2">
@@ -160,29 +188,35 @@
           Agrupar y Descargar Todo en ZIP
         </button>
       </div>
-      <button id="resetGroupByBtn" class="w-full bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600 mt-2 transition-colors">
-        Reiniciar
-      </button>
+      <!-- Sección de resultados -->
       <div id="groupByDownloadSection" class="hidden mt-8">
         <h3 class="text-xl font-bold mb-2">Archivos Agrupados</h3>
         <ul id="groupByDownloadList" class="list-disc pl-5 mb-4"></ul>
+        <button id="downloadAllIndividualBtn" class="w-full bg-indigo-500 text-white py-2 px-4 rounded hover:bg-indigo-600 transition-colors hidden">
+          Descargar Todos Individualmente
+        </button>
       </div>
+      <button id="resetGroupByBtn" class="w-full bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600 mt-2 transition-colors">
+        Reiniciar
+      </button>
     </section>
 
-    <!-- SECCIÓN: Mensajería interna e Email -->
+    <!-- ================================
+         SECCIÓN: Mensajería interna e Email
+         ================================ -->
     <section id="groupSection" class="hidden">
       <h1 class="text-3xl font-bold mb-6">Mensajería interna e Email</h1>
       <p class="mb-6 leading-relaxed">
-        Carga un archivo CSV, agrupa los registros por <code class="bg-gray-100 px-1 py-0.5 rounded">currency_iso</code> y genera archivos con el nombre y carpeta elegidos (Mensajería interna o Email). El sistema dividirá los archivos según el intervalo de líneas especificado.
+        Carga uno o varios archivos CSV, agrupa los registros por <span class="bg-gray-200 dark:bg-gray-600 px-1 py-0.5 rounded">currency_iso</span> y genera archivos con el nombre y carpeta elegidos. Se dividirán los archivos según el intervalo de líneas especificado.
       </p>
-      <!-- Slider para definir cantidad de líneas por archivo en Mensajería interna e Email -->
+      <!-- Slider para definir cantidad de líneas -->
       <div class="flex flex-col md:flex-row items-center mb-6">
         <label for="emailRestrictSlider" class="font-medium mr-4">Líneas por archivo:</label>
         <input type="range" id="emailRestrictSlider" min="0" max="10000" value="899" class="mr-2">
         <input type="number" id="emailRestrictInput" min="0" class="w-20 border border-gray-300 rounded px-2 py-1" value="899">
         <span class="ml-2 text-sm text-gray-500">(0 = sin restricción)</span>
       </div>
-      <!-- Opciones de nombres para los archivos -->
+      <!-- Opciones de nombres para archivos -->
       <div class="mb-6">
         <label for="fileNamingGroup" class="block mb-2 font-semibold">Opciones de nombres (archivos):</label>
         <select id="fileNamingGroup" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300">
@@ -192,28 +226,7 @@
         </select>
         <input type="text" id="customFileNameGroup" placeholder="Nombre personalizado para el archivo" class="w-full border border-gray-300 rounded px-3 py-2 mt-2 hidden focus:outline-none focus:ring focus:ring-blue-300" />
       </div>
-      <!-- Comportamiento para ajustar el slider según la opción seleccionada -->
-      <script>
-        document.getElementById("fileNamingGroup").addEventListener("change", (e) => {
-          const value = e.target.value;
-          const customFileNameGroup = document.getElementById("customFileNameGroup");
-          if (value === "custom") {
-            customFileNameGroup.classList.remove("hidden");
-          } else {
-            customFileNameGroup.classList.add("hidden");
-          }
-          const slider = document.getElementById("emailRestrictSlider");
-          const input = document.getElementById("emailRestrictInput");
-          if (value === "mensajeria_interna") {
-            slider.value = 899;
-            input.value = 899;
-          } else if (value === "email") {
-            slider.value = 0;
-            input.value = 0;
-          }
-        });
-      </script>
-      <!-- Opciones para nombrar la carpeta de exportación -->
+      <!-- Opciones para nombrar la carpeta -->
       <div class="mb-6">
         <label for="folderNamingGroup" class="block mb-2 font-semibold">Nombre de carpeta:</label>
         <select id="folderNamingGroup" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300">
@@ -223,49 +236,54 @@
         </select>
         <input type="text" id="customFolderNameGroup" placeholder="Nombre personalizado para la carpeta" class="w-full border border-gray-300 rounded px-3 py-2 mt-2 hidden focus:outline-none focus:ring focus:ring-blue-300" />
       </div>
+      <!-- Input para cargar múltiples CSV -->
       <div class="mb-6">
-        <input type="file" id="csvFile" accept=".csv" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300" />
+        <input type="file" id="csvFile" multiple accept=".csv" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300" />
       </div>
-      <button id="processBtn" class="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition-colors">
-        Procesar
-      </button>
-      <button id="resetGroupBtn" class="w-full bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600 mt-2 transition-colors">
-        Reiniciar
-      </button>
+      <!-- Lista de archivos cargados -->
+      <div class="mb-6">
+        <h4 class="font-semibold mb-2">Archivos a unificar:</h4>
+        <ul id="groupFileList" class="list-disc pl-5 text-sm text-gray-600"></ul>
+      </div>
+      <button id="processBtn" class="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition-colors">Procesar</button>
+      <button id="resetGroupBtn" class="w-full bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600 mt-2 transition-colors">Reiniciar</button>
       <div id="groupDownloadSection" class="hidden mt-8">
         <h3 class="text-xl font-bold mb-2">Archivos Generados</h3>
         <ul id="groupDownloadList" class="list-disc pl-5 mb-4"></ul>
-        <button id="groupDownloadAllBtn" class="w-full bg-purple-500 text-white py-2 px-4 rounded hover:bg-purple-600 transition-colors">
-          Descargar Todo
-        </button>
+        <button id="groupDownloadAllBtn" class="w-full bg-purple-500 text-white py-2 px-4 rounded hover:bg-purple-600 transition-colors">Descargar Todo</button>
       </div>
     </section>
 
-    <!-- SECCIÓN: Acreditar FS por juego y moneda -->
+    <!-- ================================
+         SECCIÓN: Acreditar FS por juego y moneda
+         ================================
+         Se unifican CSV de datos (sin encabezado) y se agrupan por moneda,
+         utilizando como referencia el CSV "Juego, Moneda y Día:" para filtrar según el día.
+         Además, se adjunta (desde una carpeta persistente) la imagen que coincida con el nombre del juego.
+    -->
     <section id="acreditarSection" class="hidden">
       <h1 class="text-3xl font-bold mb-6">Acreditar FS por juego y moneda</h1>
       <p class="mb-6 leading-relaxed">
-        Selecciona varios archivos CSV (sin encabezado) para unificarlos y agruparlos por la columna de monedas (p. ej. VES, CLP, PEN, etc.). Después, selecciona un CSV que incluya <strong>Juego</strong>, <strong>Moneda</strong> y <strong>Día</strong>, para que el sistema pueda filtrar según el día de la semana y reagrupar la data por cada juego.
+        Selecciona varios archivos CSV (sin encabezado) para unificarlos y agruparlos por la columna de monedas. Luego, selecciona un CSV con <strong>Juego, Moneda y Día</strong> que se guardará en el navegador para filtrar según el día seleccionado. Además, carga una carpeta con imágenes de juegos; ésta se guardará en la aplicación y las imágenes que se adjunten en el ZIP serán aquellas cuyo nombre coincida (de forma insensible) con el nombre del juego del CSV.
       </p>
-      <!-- Selección de múltiples CSV con datos a acreditar -->
+      <!-- CSV de datos -->
       <div class="mb-6">
         <label class="block mb-2 font-semibold">Archivos CSV de datos (sin encabezado):</label>
         <input type="file" id="acreditarDataFiles" multiple accept=".csv" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300" />
       </div>
-      <!-- Listado de archivos con opción de eliminar -->
       <div class="mb-6">
         <h4 class="font-semibold mb-2">Archivos a acreditar:</h4>
         <ul id="acreditarFileList" class="list-disc pl-5 text-sm text-gray-600"></ul>
       </div>
-      <!-- Selección del CSV que mapea Juego, Moneda y Día -->
+      <!-- CSV con Juego, Moneda y Día -->
       <div class="mb-6">
         <label class="block mb-2 font-semibold">CSV con Juego, Moneda y Día:</label>
         <input type="file" id="juegoCurrencyFile" accept=".csv" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300" />
         <p class="text-xs text-gray-500 mt-1">
-          Este CSV se guardará en el navegador hasta que lo actualices. Formato de columnas (sin encabezado): <em>juego, moneda, día</em>.
+          Este CSV se guardará en el navegador. Formato: <em>juego, moneda, día</em>.
         </p>
       </div>
-      <!-- Selección del día de la semana -->
+      <!-- Selección de día -->
       <div class="mb-6">
         <label for="selectWeekDay" class="block mb-2 font-semibold">Selecciona el día de la semana:</label>
         <select id="selectWeekDay" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300">
@@ -278,21 +296,25 @@
           <option value="6">Sábado</option>
         </select>
       </div>
-      <button id="acreditarProcessBtn" class="w-full bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 transition-colors">
-        Procesar
-      </button>
-      <button id="resetAcreditarBtn" class="w-full bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600 mt-2 transition-colors">
-        Reiniciar
-      </button>
+      <!-- Imágenes de juegos -->
+      <div class="mb-6">
+        <label class="block mb-2 font-semibold">Imágenes de juegos:</label>
+        <input type="file" id="gameImagesInput" webkitdirectory directory multiple accept="image/*" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300" />
+      </div>
+      <div class="mb-6">
+        <h4 class="font-semibold mb-2">Imágenes subidas:</h4>
+        <ul id="gameImagesList" class="list-disc pl-5 text-sm text-gray-600"></ul>
+      </div>
+      <button id="acreditarProcessBtn" class="w-full bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 transition-colors">Procesar</button>
+      <button id="resetAcreditarBtn" class="w-full bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600 mt-2 transition-colors">Reiniciar</button>
       <div id="acreditarDownloadSection" class="hidden mt-8">
         <h3 class="text-xl font-bold mb-2">Archivos Generados</h3>
         <ul id="acreditarResultList" class="list-disc pl-5 mb-4"></ul>
-        <button id="acreditarDownloadAllBtn" class="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition-colors">
-          Descargar Todo
-        </button>
+        <button id="acreditarDownloadAllBtn" class="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition-colors">Descargar Todo</button>
       </div>
     </section>
-  </div><!-- Fin contenedor principal -->
+  </div>
+  <!-- Fin contenedor principal -->
 
   <!-- Slider para modo diurno/nocturno -->
   <div class="fixed top-4 right-4 z-50">
@@ -302,7 +324,7 @@
         <div class="w-10 h-4 bg-gray-400 rounded-full shadow-inner"></div>
         <div class="dot absolute w-6 h-6 bg-white rounded-full shadow -left-1 -top-1 transition"></div>
       </div>
-      <span class="ml-3 text-gray-700" id="themeLabel">Modo Nocturno</span>
+      <span class="ml-3" id="themeLabel">Modo Nocturno</span>
     </label>
   </div>
 
@@ -316,433 +338,443 @@
     // ====== Funciones de utilidad ======
     const formatDate = () => {
       const today = new Date();
-      return today.getFullYear() + "_" +
-             String(today.getMonth() + 1).padStart(2, "0") + "_" +
-             String(today.getDate()).padStart(2, "0");
+      return today.getFullYear() + "_" + String(today.getMonth() + 1).padStart(2, "0") + "_" + String(today.getDate()).padStart(2, "0");
     };
-
-    const arrayToCSV = (rows) => {
-      return rows.map((cols) => cols.join(",")).join("\n");
-    };
+    const arrayToCSV = (rows) => rows.map(cols => cols.join(",")).join("\n");
 
     // ====== Control de navegación ======
-    document.querySelectorAll("nav button").forEach((btn) => {
+    document.querySelectorAll("nav button").forEach(btn => {
       btn.addEventListener("click", () => {
-        document.querySelectorAll('section[id$="Section"], section[id$="section"]').forEach((section) => {
-          section.classList.add("hidden");
-        });
-        // Para "Agrupar por" se utiliza el id "groupbySection"
+        document.querySelectorAll('section[id$="Section"], section[id$="section"]').forEach(section => section.classList.add("hidden"));
         const btnId = btn.id;
-        let sectionId = "";
-        if (btnId === "navGroupBy") {
-          sectionId = "groupbySection";
-        } else {
-          sectionId = btnId.replace("nav", "").toLowerCase() + "Section";
-        }
+        let sectionId = (btnId === "navGroupBy") ? "groupbySection" : btnId.replace("nav", "").toLowerCase() + "Section";
         document.getElementById(sectionId).classList.remove("hidden");
       });
     });
 
     // ====== Variables globales ======
+    let groupFiles = [];
     let mergeFiles = [];
-    let acreditarDataRows = [];
+    let groupByFiles = [];
+    let groupByResults = [];
+    let splitResults = [];
     let acreditarFiles = [];
+    let acreditarDataRows = [];
     let juegoCurrencyContent = "";
     let gameCurrencyMap = {};
+    let gameImages = {}; // Guardará las imágenes (clave: nombre en minúsculas, valor: {name, content})
 
+    // ====== Persistir CSV y imágenes ======
     window.addEventListener("load", () => {
       const storedCSV = localStorage.getItem("gameCurrencyCSV");
-      if (storedCSV) {
+      if(storedCSV){
         juegoCurrencyContent = storedCSV;
         console.log("CSV de juego-moneda-día cargado desde localStorage.");
       }
+      const storedImages = localStorage.getItem("gameImages");
+      if(storedImages) {
+        try {
+          gameImages = JSON.parse(storedImages);
+          actualizarListaGameImages();
+        } catch(e) { console.error("Error al cargar imágenes desde localStorage", e); }
+      }
     });
 
     // ================================
-    // SECCIÓN: Mensajería interna e Email
+    // SECCIÓN: Unificar Archivos
     // ================================
-    document.getElementById("fileNamingGroup").addEventListener("change", (e) => {
-      const value = e.target.value;
-      const customFileNameGroup = document.getElementById("customFileNameGroup");
-      if (value === "custom") {
-        customFileNameGroup.classList.remove("hidden");
-      } else {
-        customFileNameGroup.classList.add("hidden");
-      }
-      // Cada vez que se selecciona una opción, se ajusta el slider:
-      const slider = document.getElementById("emailRestrictSlider");
-      const input = document.getElementById("emailRestrictInput");
-      if (value === "mensajeria_interna") {
-        slider.value = 899;
-        input.value = 899;
-      } else if (value === "email") {
-        slider.value = 0;
-        input.value = 0;
-      }
-    });
-
-    document.getElementById("folderNamingGroup").addEventListener("change", (e) => {
-      const value = e.target.value;
-      const customFolderNameGroup = document.getElementById("customFolderNameGroup");
-      if (value === "custom") {
-        customFolderNameGroup.classList.remove("hidden");
-      } else {
-        customFolderNameGroup.classList.add("hidden");
-      }
-    });
-
-    document.getElementById("processBtn").addEventListener("click", async () => {
-      const file = document.getElementById("csvFile").files[0];
-      if (!file) return alert("Selecciona un archivo CSV");
-
-      const text = (await file.text()).trim();
-      const rows = text.split("\n").filter(row => row.trim() !== "");
-      const headers = rows.shift().split(",").map(h => h.trim());
-      const currencyIndex = headers.indexOf("currency_iso");
-      const userIdIndex = headers.indexOf("user_id");
-
-      if (currencyIndex === -1 || userIdIndex === -1) {
-        return alert("El archivo no tiene las columnas requeridas (currency_iso, user_id).");
-      }
-
-      const groups = {};
-      rows.forEach((row) => {
-        const cols = row.split(",").map(c => c.trim());
-        if (cols.length > Math.max(currencyIndex, userIdIndex)) {
-          const currency = cols[currencyIndex];
-          const userId = cols[userIdIndex];
-          if (currency && userId) {
-            if (!groups[currency]) groups[currency] = [];
-            groups[currency].push(userId);
-          }
-        }
-      });
-
-      const folderNamingOption = document.getElementById("folderNamingGroup").value;
-      const customFolderName = document.getElementById("customFolderNameGroup").value;
-      let folderName = "";
-      if (folderNamingOption === "mensajeria_interna") {
-        folderName = `Mensajería_Interna_${formatDate()}`;
-      } else if (folderNamingOption === "email") {
-        folderName = `Email_${formatDate()}`;
-      } else {
-        folderName = `${customFolderName.replace(/[^a-z0-9]/gi, "_")}_${formatDate()}`;
-      }
-
-      const zip = new JSZip();
-      const folder = zip.folder(folderName);
-      const namingOption = document.getElementById("fileNamingGroup").value;
-      const customName = document.getElementById("customFileNameGroup").value;
-      let chunkSize = parseInt(document.getElementById("emailRestrictInput").value, 10);
-      if (chunkSize === 0) {
-        chunkSize = Infinity;
-      }
-
-      Object.entries(groups).forEach(([currency, users]) => {
-        const chunks = (chunkSize === Infinity)
-          ? [users]
-          : Array.from({ length: Math.ceil(users.length / chunkSize) }, (_, i) =>
-              users.slice(i * chunkSize, (i + 1) * chunkSize)
-            );
-        chunks.forEach((chunk, i) => {
-          let fileName = "";
-          if (namingOption === "mensajeria_interna") {
-            fileName = `${currency}_MI_${formatDate()}_${i + 1}.csv`;
-          } else if (namingOption === "email") {
-            fileName = `${currency}_EMAIL_${formatDate()}_${i + 1}.csv`;
-          } else {
-            fileName = `${customName.replace(/[^a-z0-9]/gi, "_")}_${currency}_${formatDate()}_${i + 1}.csv`;
-          }
-          const content = ["user_id", ...chunk].join("\n").trim();
-          folder.file(fileName, content);
-        });
-      });
-
-      const blob = await zip.generateAsync({ type: "blob" });
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.download = `${folderName}.zip`;
-      link.click();
-    });
-
-    // ================================
-    // SECCIÓN: Unificar
-    // ================================
-    document.getElementById("fileNamingMerge").addEventListener("change", function () {
-      const isCustom = this.value === "custom";
-      document.getElementById("customFileNameMerge").classList.toggle("hidden", !isCustom);
-    });
-
     const mergeFilesInput = document.getElementById("mergeFilesInput");
-    mergeFilesInput.addEventListener("change", async (e) => {
+    mergeFilesInput.addEventListener("change", e => {
       const files = Array.from(e.target.files);
-      for (const file of files) {
-        const content = (await file.text()).trim();
-        mergeFiles.push({ name: file.name, content });
-      }
-      actualizarListaArchivosMerge();
+      mergeFiles = mergeFiles.concat(files);
+      actualizarListaMergeFiles();
       e.target.value = "";
     });
-
-    function actualizarListaArchivosMerge() {
+    function actualizarListaMergeFiles(){
       const list = document.getElementById("mergeFileList");
       list.innerHTML = "";
       mergeFiles.forEach((file, index) => {
         const li = document.createElement("li");
-        li.className = "mb-1 flex items-center";
+        li.className = "mb-1 flex items-center file-item";
         const spanName = document.createElement("span");
         spanName.textContent = file.name;
         const removeBtn = document.createElement("span");
         removeBtn.textContent = "×";
-        removeBtn.className = "text-red-500 text-xl cursor-pointer hover:text-red-700 ml-1";
+        removeBtn.className = "remove-file";
         removeBtn.addEventListener("click", () => {
           mergeFiles.splice(index, 1);
-          actualizarListaArchivosMerge();
+          actualizarListaMergeFiles();
         });
         li.appendChild(spanName);
         li.appendChild(removeBtn);
         list.appendChild(li);
       });
     }
-
-    document.getElementById("mergeBtn").addEventListener("click", async () => {
-      if (mergeFiles.length < 2) {
-        alert("Selecciona al menos 2 archivos para unificar (o uno con varias selecciones).");
-        return;
+    // Agregar listener para habilitar input de nombre personalizado en Unificar Archivos
+    document.getElementById("fileNamingMerge").addEventListener("change", function() {
+      if(this.value === "custom"){
+        document.getElementById("customFileNameMerge").classList.remove("hidden");
+      } else {
+        document.getElementById("customFileNameMerge").classList.add("hidden");
       }
-      try {
-        const namingOption = document.getElementById("fileNamingMerge").value;
-        const customName = document.getElementById("customFileNameMerge").value;
-        const mergedContent = mergeFiles
-          .map(file => file.content.replace(/(\r\n|\n|\r)+/g, "\n").trim())
-          .join("\n")
-          .replace(/(\r\n|\n|\r)+/g, "\n")
-          .trim();
-
-        let fileName = "";
-        if (namingOption === "unificado") {
-          fileName = `UNIFICADO_${formatDate()}.csv`;
+    });
+    document.getElementById("mergeBtn").addEventListener("click", async () => {
+      if(mergeFiles.length === 0) return alert("Selecciona al menos un archivo CSV");
+      let allRows = [];
+      let header = null;
+      for(let i=0; i<mergeFiles.length; i++){
+        const text = (await mergeFiles[i].text()).trim();
+        let rows = text.split("\n").filter(row => row.trim() !== "");
+        if(rows.length === 0) continue;
+        if(i === 0) {
+          header = rows.shift();
+          allRows.push(header);
         } else {
-          fileName = `${customName.replace(/[^a-z0-9]/gi, "_")}.csv`;
+          rows.shift();
         }
-
-        const blob = new Blob([mergedContent], { type: "text/csv" });
+        allRows = allRows.concat(rows);
+      }
+      if(!header) return alert("No se encontró cabecera en los archivos.");
+      let fileName;
+      const namingOption = document.getElementById("fileNamingMerge").value;
+      if(namingOption === "custom"){
+        const customName = document.getElementById("customFileNameMerge").value.trim();
+        fileName = customName ? customName : "unificado";
+      } else {
+        fileName = "unificado";
+      }
+      const blob = new Blob([allRows.join("\n")], { type:"text/csv" });
+      document.getElementById("mergeDownloadSection").classList.remove("hidden");
+      document.getElementById("mergeDownloadBtn").onclick = function() {
         const link = document.createElement("a");
         link.href = URL.createObjectURL(blob);
-        link.download = fileName;
+        link.download = `${fileName}_${formatDate()}.csv`;
         link.click();
-
-        document.getElementById("mergeDownloadSection").classList.remove("hidden");
-      } catch (error) {
-        alert("Error procesando archivos: " + error.message);
       }
     });
-
-    document.getElementById("resetMergeBtn").addEventListener("click", () => {
-      resetSection("mergeSection");
-    });
+    document.getElementById("resetMergeBtn").addEventListener("click", () => { resetSection("mergeSection"); });
 
     // ================================
-    // SECCIÓN: Dividir
+    // SECCIÓN: Dividir Archivo
     // ================================
     document.getElementById("splitBtn").addEventListener("click", async () => {
-      const file = document.getElementById("splitFile").files[0];
-      if (!file) return alert("Selecciona un archivo para dividir.");
-      const text = (await file.text()).trim();
-      const rows = text.split("\n").filter(row => row.trim() !== "");
-      const baseName = document.getElementById("baseFileName").value || "ARCHIVO_DIVIDIDO";
+      const fileInput = document.getElementById("splitFile");
+      if(!fileInput.files[0]) { alert("Selecciona un archivo CSV"); return; }
+      const file = fileInput.files[0];
+      const baseName = document.getElementById("baseFileName").value.trim() || "Dividido";
       let chunkSize = parseInt(document.getElementById("splitRestrictInput").value, 10);
-      if (chunkSize === 0) {
-        chunkSize = rows.length;
+      if(chunkSize === 0) { chunkSize = Infinity; }
+      const text = await file.text();
+      const lines = text.split("\n").filter(row => row.trim() !== "");
+      if(lines.length === 0) { alert("El archivo está vacío"); return; }
+      const header = lines[0];
+      const dataLines = lines.slice(1);
+      const numChunks = Math.ceil(dataLines.length / chunkSize);
+      splitResults = [];
+      const downloadList = document.getElementById("splitDownloadList");
+      downloadList.innerHTML = "";
+      for(let i = 0; i < numChunks; i++){
+        const chunkData = dataLines.slice(i * chunkSize, (i+1)*chunkSize);
+        const csvContent = [header, ...chunkData].join("\n");
+        const fileName = `${baseName}_${formatDate()}_${i+1}.csv`;
+        splitResults.push({ fileName, content: csvContent });
+        const li = document.createElement("li");
+        li.className = "mb-1 file-item";
+        li.innerHTML = `<span class="font-semibold">${fileName}</span>`;
+        const downloadBtn = document.createElement("button");
+        downloadBtn.className = "ml-3 bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600";
+        downloadBtn.textContent = "Descargar";
+        downloadBtn.addEventListener("click", () => {
+          const blob = new Blob([csvContent], { type: "text/csv" });
+          const link = document.createElement("a");
+          link.href = URL.createObjectURL(blob);
+          link.download = fileName;
+          link.click();
+        });
+        li.appendChild(downloadBtn);
+        downloadList.appendChild(li);
       }
+      document.getElementById("splitDownloadSection").classList.remove("hidden");
+    });
+    document.getElementById("splitDownloadAllBtn").addEventListener("click", async () => {
+      if(splitResults.length === 0) return;
       const zip = new JSZip();
-      const folderName = `DIVIDIDO_${formatDate()}`;
-      const folder = zip.folder(folderName);
-      const header = rows.shift();
-      let chunkNumber = 1;
-      while (rows.length > 0) {
-        const chunk = rows.splice(0, chunkSize);
-        const fileName = `${baseName.replace(/[^a-z0-9]/gi, "_")}_${chunkNumber}.csv`;
-        const content = [header, ...chunk].join("\n").trim();
-        folder.file(fileName, content);
-        chunkNumber++;
-      }
-      const blob = await zip.generateAsync({ type: "blob" });
+      const folder = zip.folder(`Dividido_${formatDate()}`);
+      splitResults.forEach(result => {
+         folder.file(result.fileName, result.content);
+      });
+      const blob = await zip.generateAsync({type:"blob"});
       const link = document.createElement("a");
       link.href = URL.createObjectURL(blob);
-      link.download = `${folderName}.zip`;
+      link.download = `Dividido_${formatDate()}.zip`;
       link.click();
     });
-
-    document.getElementById("resetSplitBtn").addEventListener("click", () => {
-      resetSection("splitSection");
-    });
+    document.getElementById("resetSplitBtn").addEventListener("click", () => { resetSection("splitSection"); });
 
     // ================================
     // SECCIÓN: Agrupar por
     // ================================
-    document.getElementById("groupByIndividualBtn").addEventListener("click", async () => {
-      const fileInput = document.getElementById("groupByCSV");
-      if (fileInput.files.length === 0) {
-        alert("Selecciona un archivo CSV para agrupar.");
-        return;
-      }
-      const file = fileInput.files[0];
-      const text = await file.text();
-      const rows = text.split("\n").filter(row => row.trim() !== "");
-      if (rows.length < 1) {
-         alert("El archivo CSV está vacío.");
-         return;
-      }
-      const header = rows[0].split(",").map(s => s.trim());
-      const groupField = document.getElementById("groupByField").value.trim();
-      if (!groupField) {
-         alert("Ingresa el campo por el cual agrupar.");
-         return;
-      }
-      const groupIndex = header.findIndex(h => h.toLowerCase() === groupField.toLowerCase());
-      if (groupIndex === -1) {
-         alert("El campo de agrupación no se encontró en el CSV.");
-         return;
-      }
-      // Opcional: campos a exportar
-      const exportFieldsInput = document.getElementById("exportFields").value.trim();
-      let exportIndices = null;
-      if (exportFieldsInput !== "") {
-         const exportFields = exportFieldsInput.split(",").map(f => f.trim().toLowerCase());
-         exportIndices = exportFields.map(field => header.findIndex(h => h.toLowerCase() === field)).filter(index => index !== -1);
-         if (exportIndices.length === 0) {
-            alert("Ninguno de los campos a exportar se encontró en el CSV.");
-            return;
-         }
-      }
-      const finalHeader = exportIndices ? exportIndices.map(i => header[i]) : header;
-      // Agrupar las filas (omitimos el encabezado)
-      const grouping = {};
-      for (let i = 1; i < rows.length; i++){
-           const rowCols = rows[i].split(",").map(s => s.trim());
-           const key = rowCols[groupIndex] || "sin_valor";
-           if (!grouping[key]) grouping[key] = [];
-           grouping[key].push(rowCols);
-      }
-      const downloadList = document.getElementById("groupByDownloadList");
-      downloadList.innerHTML = "";
-      const dateStr = formatDate();
-      const baseName = document.getElementById("groupByFileName").value.trim();
-      let groupRestrict = parseInt(document.getElementById("groupByRestrictInput").value, 10);
-      for (const groupValue in grouping) {
-           const groupRows = grouping[groupValue];
-           if (groupRestrict === 0) groupRestrict = groupRows.length;
-           const chunks = [];
-           for (let i = 0; i < groupRows.length; i += groupRestrict) {
-             chunks.push(groupRows.slice(i, i + groupRestrict));
-           }
-           chunks.forEach((chunk, index) => {
-             const fileName = baseName ? `${baseName}_${groupValue}_${groupField}_${dateStr}${chunks.length > 1 ? "_" + (index+1) : ""}.csv` : `${groupValue}_${groupField}_${dateStr}${chunks.length > 1 ? "_" + (index+1) : ""}.csv`;
-             let content = finalHeader.join(",") + "\n";
-             chunk.forEach(row => {
-               const finalRow = exportIndices ? exportIndices.map(i => row[i]) : row;
-               content += finalRow.join(",") + "\n";
-             });
-             const li = document.createElement("li");
-             li.className = "mb-1 flex items-center";
-             const spanName = document.createElement("span");
-             spanName.textContent = fileName;
-             const downloadBtn = document.createElement("button");
-             downloadBtn.className = "ml-2 bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600";
-             downloadBtn.textContent = "Descargar";
-             downloadBtn.addEventListener("click", () => {
-                const blob = new Blob([content], { type: "text/csv" });
-                const link = document.createElement("a");
-                link.href = URL.createObjectURL(blob);
-                link.download = fileName;
-                link.click();
-             });
-             li.appendChild(spanName);
-             li.appendChild(downloadBtn);
-             downloadList.appendChild(li);
-           });
-      }
-      document.getElementById("groupByDownloadSection").classList.remove("hidden");
+    const groupByCSVInput = document.getElementById("groupByCSV");
+    groupByCSVInput.addEventListener("change", e => {
+      const files = Array.from(e.target.files);
+      groupByFiles = groupByFiles.concat(files);
+      actualizarListaGroupByFiles();
+      e.target.value = "";
     });
-
-    document.getElementById("groupByZipBtn").addEventListener("click", async () => {
-      const fileInput = document.getElementById("groupByCSV");
-      if (fileInput.files.length === 0) {
-        alert("Selecciona un archivo CSV para agrupar.");
-        return;
-      }
-      const file = fileInput.files[0];
-      const text = await file.text();
-      const rows = text.split("\n").filter(row => row.trim() !== "");
-      if (rows.length < 1) {
-         alert("El archivo CSV está vacío.");
+    function actualizarListaGroupByFiles(){
+      const list = document.getElementById("groupByFileList");
+      list.innerHTML = "";
+      groupByFiles.forEach((file, index) => {
+        const li = document.createElement("li");
+        li.className = "mb-1 flex items-center file-item";
+        const spanName = document.createElement("span");
+        spanName.textContent = file.name;
+        const removeBtn = document.createElement("span");
+        removeBtn.textContent = "×";
+        removeBtn.className = "remove-file";
+        removeBtn.addEventListener("click", () => {
+          groupByFiles.splice(index, 1);
+          actualizarListaGroupByFiles();
+        });
+        li.appendChild(spanName);
+        li.appendChild(removeBtn);
+        list.appendChild(li);
+      });
+    }
+    async function processGroupByFiles(){
+      if(groupByFiles.length === 0){
+         alert("Selecciona al menos un archivo CSV");
          return;
       }
-      const header = rows[0].split(",").map(s => s.trim());
+      let allRows = [];
+      let header = null;
+      for(let i=0; i<groupByFiles.length; i++){
+         const text = (await groupByFiles[i].text()).trim();
+         let rows = text.split("\n").filter(row => row.trim() !== "");
+         if(rows.length === 0) continue;
+         if(i === 0){
+            header = rows.shift().split(",").map(h => h.trim());
+         } else {
+            rows.shift();
+         }
+         rows = rows.map(row => row.split(","));
+         allRows = allRows.concat(rows);
+      }
+      if(!header){
+         alert("No se encontró cabecera en los archivos.");
+         return;
+      }
       const groupField = document.getElementById("groupByField").value.trim();
-      if (!groupField) {
-         alert("Ingresa el campo por el cual agrupar.");
+      if(!groupField){
+         alert("Ingresa el campo para agrupar.");
          return;
       }
-      const groupIndex = header.findIndex(h => h.toLowerCase() === groupField.toLowerCase());
-      if (groupIndex === -1) {
-         alert("El campo de agrupación no se encontró en el CSV.");
+      const groupFieldIndex = header.findIndex(h => h.toLowerCase() === groupField.toLowerCase());
+      if(groupFieldIndex === -1){
+         alert("El campo para agrupar no se encuentra en la cabecera.");
          return;
       }
       const exportFieldsInput = document.getElementById("exportFields").value.trim();
       let exportIndices = null;
-      if (exportFieldsInput !== "") {
-         const exportFields = exportFieldsInput.split(",").map(f => f.trim().toLowerCase());
-         exportIndices = exportFields.map(field => header.findIndex(h => h.toLowerCase() === field)).filter(index => index !== -1);
-         if (exportIndices.length === 0) {
-            alert("Ninguno de los campos a exportar se encontró en el CSV.");
-            return;
+      let exportHeader = null;
+      if(exportFieldsInput){
+         const exportFields = exportFieldsInput.split(",").map(f => f.trim());
+         exportIndices = exportFields.map(f => header.findIndex(h => h.toLowerCase() === f.toLowerCase()));
+         exportIndices = exportIndices.filter(idx => idx !== -1);
+         exportHeader = exportIndices.map(idx => header[idx]);
+      } else {
+         exportIndices = header.map((_, i) => i);
+         exportHeader = header;
+      }
+      const groups = {};
+      allRows.forEach(row => {
+         const key = row[groupFieldIndex];
+         if(!groups[key]) groups[key] = [];
+         groups[key].push(row);
+      });
+      let chunkSize = parseInt(document.getElementById("groupByRestrictInput").value, 10);
+      if(chunkSize === 0) { chunkSize = Infinity; }
+      const results = [];
+      const baseNameInput = document.getElementById("groupByFileName").value.trim();
+      Object.entries(groups).forEach(([groupKey, rows]) => {
+         const processedRows = rows.map(row => exportIndices.map(i => row[i]));
+         const csvHeader = exportHeader.join(",");
+         const numChunks = Math.ceil(processedRows.length / chunkSize);
+         for(let i=0; i<numChunks; i++){
+            const chunkRows = processedRows.slice(i*chunkSize, (i+1)*chunkSize);
+            const csvContent = [csvHeader, ...chunkRows.map(r => r.join(","))].join("\n");
+            let fileName;
+            if(baseNameInput){
+               fileName = `${baseNameInput}_${groupKey}_${formatDate()}_${i+1}.csv`;
+            } else {
+               fileName = `Agrupado_${groupKey}_${formatDate()}_${i+1}.csv`;
+            }
+            results.push({ fileName, content: csvContent });
          }
-      }
-      const finalHeader = exportIndices ? exportIndices.map(i => header[i]) : header;
-      const grouping = {};
-      for (let i = 1; i < rows.length; i++){
-           const rowCols = rows[i].split(",").map(s => s.trim());
-           const key = rowCols[groupIndex] || "sin_valor";
-           if (!grouping[key]) grouping[key] = [];
-           grouping[key].push(rowCols);
-      }
-      const zip = new JSZip();
-      const dateStr = formatDate();
+      });
+      return results;
+    }
+    document.getElementById("groupByIndividualBtn").addEventListener("click", async () => {
+      const results = await processGroupByFiles();
+      if(!results || results.length === 0) return;
+      groupByResults = results;
+      const list = document.getElementById("groupByDownloadList");
+      list.innerHTML = "";
+      results.forEach(file => {
+         const li = document.createElement("li");
+         li.className = "mb-1 file-item";
+         li.innerHTML = `<span class="font-semibold">${file.fileName}</span>`;
+         const downloadBtn = document.createElement("button");
+         downloadBtn.className = "ml-3 bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600";
+         downloadBtn.textContent = "Descargar";
+         downloadBtn.addEventListener("click", () => {
+            const blob = new Blob([file.content], { type: "text/csv" });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = file.fileName;
+            link.click();
+         });
+         li.appendChild(downloadBtn);
+         list.appendChild(li);
+      });
+      document.getElementById("groupByDownloadSection").classList.remove("hidden");
+      document.getElementById("downloadAllIndividualBtn").classList.remove("hidden");
+    });
+    document.getElementById("downloadAllIndividualBtn").addEventListener("click", () => {
+      if(!groupByResults || groupByResults.length === 0) return;
+      groupByResults.forEach(file => {
+         const blob = new Blob([file.content], { type: "text/csv" });
+         const link = document.createElement("a");
+         link.href = URL.createObjectURL(blob);
+         link.download = file.fileName;
+         link.click();
+      });
+    });
+    document.getElementById("groupByZipBtn").addEventListener("click", async () => {
+      const results = await processGroupByFiles();
+      if(!results || results.length === 0) return;
       const folderNameInput = document.getElementById("groupByFolderName").value.trim();
-      const folderName = folderNameInput ? `${folderNameInput}_${groupField}_${dateStr}` : `AGRUPAR_${groupField}_${dateStr}`;
+      const folderName = folderNameInput ? folderNameInput : `Agrupado_${formatDate()}`;
+      const zip = new JSZip();
       const folder = zip.folder(folderName);
-      const baseName = document.getElementById("groupByFileName").value.trim();
-      let groupRestrict = parseInt(document.getElementById("groupByRestrictInput").value, 10);
-      for (const groupValue in grouping) {
-           const groupRows = grouping[groupValue];
-           if (groupRestrict === 0) groupRestrict = groupRows.length;
-           const chunks = [];
-           for (let i = 0; i < groupRows.length; i += groupRestrict) {
-             chunks.push(groupRows.slice(i, i + groupRestrict));
-           }
-           chunks.forEach((chunk, index) => {
-             const fileName = baseName ? `${baseName}_${groupValue}_${groupField}_${dateStr}${chunks.length > 1 ? "_" + (index+1) : ""}.csv` : `${groupValue}_${groupField}_${dateStr}${chunks.length > 1 ? "_" + (index+1) : ""}.csv`;
-             let content = finalHeader.join(",") + "\n";
-             chunk.forEach(row => {
-               const finalRow = exportIndices ? exportIndices.map(i => row[i]) : row;
-               content += finalRow.join(",") + "\n";
-             });
-             folder.file(fileName, content);
-           });
+      results.forEach(file => {
+         folder.file(file.fileName, file.content);
+      });
+      zip.generateAsync({type:"blob"}).then(blob => {
+         const link = document.createElement("a");
+         link.href = URL.createObjectURL(blob);
+         link.download = `${folderName}.zip`;
+         link.click();
+      });
+    });
+    document.getElementById("resetGroupByBtn").addEventListener("click", () => { resetSection("groupbySection"); });
+
+    // ================================
+    // SECCIÓN: Mensajería interna e Email
+    // ================================
+    document.getElementById("fileNamingGroup").addEventListener("change", e => {
+      const value = e.target.value;
+      const customFileNameGroup = document.getElementById("customFileNameGroup");
+      if(value === "custom") customFileNameGroup.classList.remove("hidden"); else customFileNameGroup.classList.add("hidden");
+      const slider = document.getElementById("emailRestrictSlider");
+      const input = document.getElementById("emailRestrictInput");
+      if(value === "mensajeria_interna") { slider.value = 899; input.value = 899; } 
+      else if(value === "email") { slider.value = 0; input.value = 0; }
+    });
+    document.getElementById("folderNamingGroup").addEventListener("change", e => {
+      const value = e.target.value;
+      const customFolderNameGroup = document.getElementById("customFolderNameGroup");
+      if(value === "custom") customFolderNameGroup.classList.remove("hidden"); else customFolderNameGroup.classList.add("hidden");
+    });
+    const groupFileInput = document.getElementById("csvFile");
+    groupFileInput.addEventListener("change", e => {
+      const files = Array.from(e.target.files);
+      groupFiles = groupFiles.concat(files);
+      actualizarListaGroupFiles();
+      e.target.value = "";
+    });
+    function actualizarListaGroupFiles(){
+      const list = document.getElementById("groupFileList");
+      list.innerHTML = "";
+      groupFiles.forEach((file, index) => {
+        const li = document.createElement("li");
+        li.className = "mb-1 flex items-center file-item";
+        const spanName = document.createElement("span");
+        spanName.textContent = file.name;
+        const removeBtn = document.createElement("span");
+        removeBtn.textContent = "×";
+        removeBtn.className = "remove-file";
+        removeBtn.addEventListener("click", () => {
+          groupFiles.splice(index, 1);
+          actualizarListaGroupFiles();
+        });
+        li.appendChild(spanName);
+        li.appendChild(removeBtn);
+        list.appendChild(li);
+      });
+    }
+    document.getElementById("processBtn").addEventListener("click", async () => {
+      if(groupFiles.length === 0) return alert("Selecciona al menos un archivo CSV");
+      let allRows = [];
+      let header = null;
+      for(let i=0; i<groupFiles.length; i++){
+        const text = (await groupFiles[i].text()).trim();
+        let rows = text.split("\n").filter(row => row.trim() !== "");
+        if(rows.length === 0) continue;
+        if(i === 0) {
+          header = rows.shift().split(",").map(h => h.trim());
+          allRows = allRows.concat(rows);
+        } else {
+          rows.shift();
+          allRows = allRows.concat(rows);
+        }
       }
-      const blob = await zip.generateAsync({ type: "blob" });
+      if(!header) return alert("No se encontró cabecera en los archivos.");
+      const currencyIndex = header.indexOf("currency_iso");
+      const userIdIndex = header.indexOf("user_id");
+      if(currencyIndex === -1 || userIdIndex === -1) return alert("El archivo no tiene las columnas requeridas (currency_iso, user_id).");
+      const groups = {};
+      allRows.forEach(row => {
+        const cols = row.split(",").map(c => c.trim());
+        if(cols.length > Math.max(currencyIndex, userIdIndex)){
+          const currency = cols[currencyIndex];
+          const userId = cols[userIdIndex];
+          if(currency && userId){
+            if(!groups[currency]) groups[currency] = [];
+            groups[currency].push(userId);
+          }
+        }
+      });
+      const folderNamingOption = document.getElementById("folderNamingGroup").value;
+      const customFolderName = document.getElementById("customFolderNameGroup").value;
+      let folderName = "";
+      if(folderNamingOption === "mensajeria_interna") folderName = `Mensajería_Interna_${formatDate()}`;
+      else if(folderNamingOption === "email") folderName = `Email_${formatDate()}`;
+      else folderName = `${customFolderName.replace(/[^a-z0-9]/gi, "_")}_${formatDate()}`;
+      const zip = new JSZip();
+      const folder = zip.folder(folderName);
+      const namingOption = document.getElementById("fileNamingGroup").value;
+      const customName = document.getElementById("customFileNameGroup").value;
+      let chunkSize = parseInt(document.getElementById("emailRestrictInput").value, 10);
+      if(chunkSize === 0) { chunkSize = Infinity; }
+      Object.entries(groups).forEach(([currency, users]) => {
+        const chunks = (chunkSize === Infinity) ? [users] : Array.from({length: Math.ceil(users.length/chunkSize)}, (_, i) => users.slice(i*chunkSize, (i+1)*chunkSize));
+        chunks.forEach((chunk, i) => {
+          let fileName = "";
+          if(namingOption === "mensajeria_interna") fileName = `${currency}_MI_${formatDate()}_${i+1}.csv`;
+          else if(namingOption === "email") fileName = `${currency}_EMAIL_${formatDate()}_${i+1}.csv`;
+          else fileName = `${customName.replace(/[^a-z0-9]/gi, "_")}_${currency}_${formatDate()}_${i+1}.csv`;
+          const content = ["user_id", ...chunk].join("\n").trim();
+          folder.file(fileName, content);
+        });
+      });
+      const blob = await zip.generateAsync({type:"blob"});
       const link = document.createElement("a");
       link.href = URL.createObjectURL(blob);
       link.download = `${folderName}.zip`;
       link.click();
     });
-
-    // Reiniciar la sección "Agrupar por"
-    document.getElementById("resetGroupByBtn").addEventListener("click", () => {
-      resetSection("groupbySection");
-    });
+    document.getElementById("resetGroupBtn").addEventListener("click", () => { resetSection("groupSection"); });
 
     // ================================
     // SECCIÓN: Acreditar FS por juego y moneda
@@ -750,7 +782,7 @@
     const acreditarDataFilesInput = document.getElementById("acreditarDataFiles");
     acreditarDataFilesInput.addEventListener("change", async (e) => {
       const files = Array.from(e.target.files);
-      for (const file of files) {
+      for(const file of files){
         const content = (await file.text()).trim();
         const lines = content.split("\n").map(row => row.split(",").map(c => c.trim()));
         acreditarFiles.push({ name: file.name, rows: lines });
@@ -758,18 +790,17 @@
       actualizarListaAcreditar();
       e.target.value = "";
     });
-
-    function actualizarListaAcreditar() {
+    function actualizarListaAcreditar(){
       const list = document.getElementById("acreditarFileList");
       list.innerHTML = "";
       acreditarFiles.forEach((file, index) => {
         const li = document.createElement("li");
-        li.className = "mb-1 flex items-center";
+        li.className = "mb-1 flex items-center file-item";
         const spanName = document.createElement("span");
         spanName.textContent = file.name;
         const removeBtn = document.createElement("span");
         removeBtn.textContent = "×";
-        removeBtn.className = "text-red-500 text-xl cursor-pointer hover:text-red-700 ml-1";
+        removeBtn.className = "remove-file";
         removeBtn.addEventListener("click", () => {
           acreditarFiles.splice(index, 1);
           actualizarListaAcreditar();
@@ -778,151 +809,184 @@
         li.appendChild(removeBtn);
         list.appendChild(li);
       });
+      // Recalcular acreditarDataRows
+      acreditarDataRows = [];
+      acreditarFiles.forEach(file => {
+        acreditarDataRows.push(...file.rows);
+      });
     }
-
     document.getElementById("juegoCurrencyFile").addEventListener("change", async (e) => {
       const file = e.target.files[0];
-      if (file) {
+      if(file){
         juegoCurrencyContent = (await file.text()).trim();
         localStorage.setItem("gameCurrencyCSV", juegoCurrencyContent);
         console.log("Nuevo CSV de juego-moneda-día guardado en localStorage.");
       }
     });
-
+    // Modificación: usar readAsDataURL para guardar imágenes en formato base64 y persistirlas
+    const gameImagesInput = document.getElementById("gameImagesInput");
+    gameImagesInput.addEventListener("change", async (e) => {
+      // No se reinicializa gameImages, se agregan las nuevas imágenes a las ya guardadas
+      const files = Array.from(e.target.files);
+      for (const file of files) {
+        const nameWithoutExt = file.name.replace(/\.[^/.]+$/, "").toLowerCase();
+        const reader = new FileReader();
+        reader.onload = () => {
+          gameImages[nameWithoutExt] = { name: file.name, content: reader.result };
+          actualizarListaGameImages();
+          // Guardar en localStorage para persistencia
+          localStorage.setItem("gameImages", JSON.stringify(gameImages));
+        };
+        reader.readAsDataURL(file);
+      }
+      e.target.value = "";
+    });
+    function actualizarListaGameImages(){
+      const list = document.getElementById("gameImagesList");
+      list.innerHTML = "";
+      Object.keys(gameImages).forEach(key => {
+        const fileObj = gameImages[key];
+        const li = document.createElement("li");
+        li.className = "mb-1 flex items-center file-item";
+        const spanName = document.createElement("span");
+        spanName.textContent = fileObj.name;
+        const removeBtn = document.createElement("span");
+        removeBtn.textContent = "×";
+        removeBtn.className = "remove-file";
+        removeBtn.addEventListener("click", () => {
+          delete gameImages[key];
+          actualizarListaGameImages();
+          localStorage.setItem("gameImages", JSON.stringify(gameImages));
+        });
+        li.appendChild(spanName);
+        li.appendChild(removeBtn);
+        list.appendChild(li);
+      });
+    }
     document.getElementById("acreditarProcessBtn").addEventListener("click", () => {
       acreditarDataRows = [];
       acreditarFiles.forEach(file => {
         acreditarDataRows.push(...file.rows);
       });
-      if (acreditarDataRows.length === 0) {
-        alert("No se han cargado archivos CSV de datos.");
-        return;
-      }
-      if (!juegoCurrencyContent) {
-        alert("No se ha cargado (o no existe) el CSV de Juego, Moneda y Día.");
-        return;
-      }
+      if(acreditarDataRows.length === 0){ alert("No se han cargado archivos CSV de datos."); return; }
+      if(!juegoCurrencyContent){ alert("No se ha cargado (o no existe) el CSV de Juego, Moneda y Día."); return; }
       const rawData = parseGameCurrencyDayCSV(juegoCurrencyContent);
       const selectedDay = parseInt(document.getElementById("selectWeekDay").value, 10);
       const dayFiltered = rawData.filter(d => parseInt(d.day) === selectedDay);
-      if (dayFiltered.length === 0) {
-        alert("No se encontraron juegos para el día seleccionado.");
-        return;
-      }
+      if(dayFiltered.length === 0){ alert("No se encontraron juegos para el día seleccionado."); return; }
       gameCurrencyMap = {};
       dayFiltered.forEach(item => {
-        if (!gameCurrencyMap[item.game]) {
-          gameCurrencyMap[item.game] = new Set();
-        }
-        gameCurrencyMap[item.game].add(item.currency);
+        const gameKey = item.game.toLowerCase();
+        if(!gameCurrencyMap[gameKey]) { gameCurrencyMap[gameKey] = new Set(); }
+        gameCurrencyMap[gameKey].add(item.currency);
       });
       const currencyIndex = detectCurrencyColumn(acreditarDataRows, gameCurrencyMap);
-      if (currencyIndex === -1) {
-        alert("No se pudo detectar la columna de moneda en los datos.");
-        return;
-      }
+      if(currencyIndex === -1){ alert("No se pudo detectar la columna de moneda en los datos."); return; }
       const groupedByCurrency = groupDataByCurrency(acreditarDataRows, currencyIndex);
       const filesByGame = createFilesForGames(gameCurrencyMap, groupedByCurrency);
+      const zip = new JSZip();
+      const date = formatDate();
+      const folder = zip.folder(`ACREDITAR_FS_${date}`);
+      // Agregar imágenes: para cada juego en gameCurrencyMap, se busca si existe una imagen cuyo nombre (minúsculas) coincida
+      if(Object.keys(gameImages).length > 0){
+        Object.keys(gameCurrencyMap).forEach(gameKey => {
+          if(gameImages[gameKey]){
+            folder.file(gameImages[gameKey].name, gameImages[gameKey].content);
+          }
+        });
+      }
+      filesByGame.forEach(({fileName, content}) => {
+        folder.file(fileName, content);
+      });
       mostrarResultadosAcreditar(filesByGame);
+      window.acreditarZip = zip;
     });
-
-    function parseGameCurrencyDayCSV(content) {
+    function parseGameCurrencyDayCSV(content){
       const lines = content.split("\n").map(row => row.split(",").map(c => c.trim()));
       const data = [];
-      for (let row of lines) {
-        if (row.length < 3) continue;
+      for(let row of lines){
+        if(row.length < 3) continue;
         let [game, currency, day] = row;
         data.push({ game, currency, day });
       }
       return data;
     }
-
-    function detectCurrencyColumn(rows, gameCurrencyMap) {
+    function detectCurrencyColumn(rows, gameCurrencyMap){
       const allCurrencies = new Set();
       Object.values(gameCurrencyMap).forEach(currencySet => {
         currencySet.forEach(c => allCurrencies.add(c));
       });
-      if (allCurrencies.size === 0) return -1;
+      if(allCurrencies.size === 0) return -1;
       const numColumns = rows[0].length;
-      let bestColumnIndex = -1;
-      let bestCount = 0;
-      for (let col = 0; col < numColumns; col++) {
+      let bestColumnIndex = -1, bestCount = 0;
+      for(let col = 0; col < numColumns; col++){
         let count = 0;
-        for (const row of rows) {
-          if (allCurrencies.has(row[col])) count++;
+        for(const row of rows){
+          if(allCurrencies.has(row[col])) count++;
         }
-        if (count > bestCount) {
-          bestCount = count;
-          bestColumnIndex = col;
-        }
+        if(count > bestCount){ bestCount = count; bestColumnIndex = col; }
       }
       return bestCount === 0 ? -1 : bestColumnIndex;
     }
-
-    function groupDataByCurrency(rows, currencyIndex) {
+    function groupDataByCurrency(rows, currencyIndex){
       const map = {};
       rows.forEach(cols => {
         const currency = cols[currencyIndex];
-        if (!map[currency]) map[currency] = [];
+        if(!map[currency]) map[currency] = [];
         map[currency].push(cols);
       });
       return map;
     }
-
-    function createFilesForGames(gameCurrencyMap, groupedByCurrency) {
+    function createFilesForGames(gameCurrencyMap, groupedByCurrency){
       const result = [];
-      for (const [game, currencySet] of Object.entries(gameCurrencyMap)) {
+      for(const [gameKey, currencySet] of Object.entries(gameCurrencyMap)){
         let combinedRows = [];
         const currencyList = Array.from(currencySet);
         currencyList.forEach(curr => {
-          if (groupedByCurrency[curr]) {
+          if(groupedByCurrency[curr]){
             combinedRows.push(...groupedByCurrency[curr]);
           }
         });
-        if (combinedRows.length === 0) continue;
+        if(combinedRows.length === 0) continue;
         const joinedCurrencies = currencyList.join("_");
-        const safeGameName = game.replace(/[^a-zA-Z0-9]/g, "_");
+        const safeGameName = gameKey.replace(/[^a-zA-Z0-9]/g, "_");
         const fileName = `ACREDITAR_${safeGameName}_${joinedCurrencies}.csv`;
         const content = arrayToCSV(combinedRows);
         result.push({ fileName, content });
       }
       return result;
     }
-
-    function mostrarResultadosAcreditar(filesByGame) {
+    function mostrarResultadosAcreditar(filesByGame){
       const list = document.getElementById("acreditarResultList");
       list.innerHTML = "";
-      if (!filesByGame || filesByGame.length === 0) {
-        alert("No se generaron archivos para acreditar.");
-        return;
-      }
+      if(!filesByGame || filesByGame.length === 0){ alert("No se generaron archivos para acreditar."); return; }
       filesByGame.forEach((f, i) => {
         const li = document.createElement("li");
-        li.className = "mb-1";
-        li.innerHTML = 
-          `<span class="font-semibold">${f.fileName}</span>
-           <button class="ml-3 bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600" data-index="${i}">
-            Descargar
-           </button>`;
-        list.appendChild(li);
-      });
-      list.querySelectorAll("button").forEach(btn => {
-        btn.addEventListener("click", (e) => {
-          const index = parseInt(e.target.dataset.index, 10);
-          const { fileName, content } = filesByGame[index];
-          const blob = new Blob([content], { type: "text/csv" });
+        li.className = "mb-1 file-item";
+        li.innerHTML = `<span class="font-semibold">${f.fileName}</span>`;
+        const downloadBtn = document.createElement("button");
+        downloadBtn.className = "ml-3 bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600";
+        downloadBtn.textContent = "Descargar";
+        downloadBtn.addEventListener("click", () => {
+          const blob = new Blob([f.content], { type: "text/csv" });
           const link = document.createElement("a");
           link.href = URL.createObjectURL(blob);
-          link.download = fileName;
+          link.download = f.fileName;
           link.click();
         });
+        li.appendChild(downloadBtn);
+        list.appendChild(li);
       });
       document.getElementById("acreditarDownloadSection").classList.remove("hidden");
+      document.getElementById("acreditarDownloadAllBtn").onclick = async () => {
+        const blob = await window.acreditarZip.generateAsync({ type: "blob" });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = `ACREDITAR_FS_${formatDate()}.zip`;
+        link.click();
+      };
     }
-
-    document.getElementById("resetAcreditarBtn").addEventListener("click", () => {
-      resetSection("acreditarSection");
-    });
+    document.getElementById("resetAcreditarBtn").addEventListener("click", () => { resetSection("acreditarSection"); });
 
     // ================================
     // Función de reinicio genérica
@@ -930,50 +994,50 @@
     const resetSection = (sectionId) => {
       const section = document.getElementById(sectionId);
       section.querySelectorAll("input:not([type='button']), select").forEach(element => {
-          if (element.type === "file") {
-            element.value = "";
-          } else if (element.type === "checkbox") {
-            element.checked = true;
-          } else if (element.type === "text" || element.type === "number") {
-            element.value = element.getAttribute("value") || "";
-          }
-          if (element.tagName === "SELECT") {
-            element.selectedIndex = 0;
-            element.dispatchEvent(new Event("change"));
-          }
+        if(element.type === "file") element.value = "";
+        else if(element.type === "checkbox") element.checked = true;
+        else if(element.type === "text" || element.type === "number") element.value = element.getAttribute("value") || "";
+        if(element.tagName === "SELECT") { element.selectedIndex = 0; element.dispatchEvent(new Event("change")); }
       });
       section.querySelectorAll(".hidden").forEach(el => el.classList.add("hidden"));
-      if (sectionId === "mergeSection") {
+      if(sectionId === "mergeSection"){
         mergeFiles = [];
         document.getElementById("mergeFileList").innerHTML = "";
-      } else if (sectionId === "acreditarSection") {
+      } else if(sectionId === "groupSection"){
+        groupFiles = [];
+        document.getElementById("groupFileList").innerHTML = "";
+      } else if(sectionId === "acreditarSection"){
         acreditarFiles = [];
         acreditarDataRows = [];
         document.getElementById("acreditarFileList").innerHTML = "";
         document.getElementById("acreditarResultList").innerHTML = "";
-      } else if (sectionId === "groupbySection") {
+      } else if(sectionId === "groupbySection"){
+        groupByFiles = [];
+        groupByResults = [];
         document.getElementById("groupByDownloadList").innerHTML = "";
+        document.getElementById("groupByFileList").innerHTML = "";
+        document.getElementById("downloadAllIndividualBtn").classList.add("hidden");
+      } else if(sectionId === "splitSection"){
+        splitResults = [];
+        document.getElementById("splitDownloadList").innerHTML = "";
       }
     };
 
     // ================================
     // Sincronizar sliders y campos numéricos
     // ================================
-    // Para Mensajería interna e Email
     document.getElementById("emailRestrictSlider").addEventListener("input", function(){
       document.getElementById("emailRestrictInput").value = this.value;
     });
     document.getElementById("emailRestrictInput").addEventListener("change", function(){
       document.getElementById("emailRestrictSlider").value = this.value;
     });
-    // Para Agrupar por
     document.getElementById("groupByRestrictSlider").addEventListener("input", function(){
       document.getElementById("groupByRestrictInput").value = this.value;
     });
     document.getElementById("groupByRestrictInput").addEventListener("change", function(){
       document.getElementById("groupByRestrictSlider").value = this.value;
     });
-    // Para Dividir
     document.getElementById("splitRestrictSlider").addEventListener("input", function(){
       document.getElementById("splitRestrictInput").value = this.value;
     });
@@ -986,8 +1050,8 @@
     // ================================
     const themeToggle = document.getElementById("themeToggle");
     const themeLabel = document.getElementById("themeLabel");
-    themeToggle.addEventListener("change", (e) => {
-      if (e.target.checked) {
+    themeToggle.addEventListener("change", e => {
+      if(e.target.checked) {
         document.body.classList.add("dark");
         themeLabel.textContent = "Modo Diurno";
       } else {
